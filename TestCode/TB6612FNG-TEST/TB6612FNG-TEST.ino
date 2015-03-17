@@ -24,7 +24,7 @@ void setup() {
   // enables serial commnication
   Serial.begin(9600);
   
-  // set all the Motor Driver pins tp OUTPUT
+  // set all the Motor Driver pins to OUTPUT
   pinMode(PWMA, OUTPUT);
   pinMode(PWMB, OUTPUT);
   pinMode(AIN1, OUTPUT);
