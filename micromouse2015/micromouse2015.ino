@@ -2,7 +2,7 @@
 Christopher Datsikas
 
 Created: 03-16-2015
-Last Modified: 03-17-2015
+Last Modified: 03-22-2015
 Status: In Progress
 Arduino Code for Micromouse for 
 2015 Brown IEEE Robotics Competition
@@ -14,6 +14,7 @@ Components:
 - TB6612FNG Dual Motor Driver Carrier - https://www.pololu.com/product/713
 - 75:1 Micro Metal Gearmotor HP with Extended Motor Shaft - https://www.pololu.com/product/2215
 - Sharp GP2Y0A51SK0F Analog Distance Sensor 2-15cm - https://www.pololu.com/product/2450
+- Magnetic Encoders 12 CPR https://www.pololu.com/product/2598
 
 Connections:
 ARD -- OTHER COMPONEENTS
@@ -51,7 +52,8 @@ BO2 -- M2 Encoder 2
 // define pins for Motor Driver
 
 void setup() {
-  Serial.begin(9600);  //starts up Serial communication
+  // enables Serial communication
+  Serial.begin(9600);
 
   // set motor driver pins to OUTPUT
 

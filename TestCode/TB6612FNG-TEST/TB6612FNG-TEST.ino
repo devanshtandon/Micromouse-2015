@@ -21,7 +21,7 @@ connected to an Arduino Nano and Pololu Micro Metal Gearmotor
 #define STBY 4
 
 void setup() {
-  // enables serial commnication
+  // enables serial communication
   Serial.begin(9600);
   
   // set all the Motor Driver pins to OUTPUT
