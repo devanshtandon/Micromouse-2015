@@ -1,10 +1,8 @@
-/* Yale Bulldog Bots
- Software for BROWN IEEE Robotics Olympiad
- Christopher Datsikas, Margaret Ott
- Francois Kassier, Bernardo Saravia, Henry Li, and Devansh Tandon 
- 3-22-2014
- // Adafruit Shield http://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/using-dc-motors
- // encoder fuctions http://www.pololu.com/docs/0J18/18
+/* RangeFinderTest.ino
+ Richard Chang
+ Created: April 2015
+ Last Modified: 04-07-2015
+ Status: Kind of works, but needs more calibration
  */
 
 //---------------------------------- Funcitons and Data required for Analog IR 
@@ -27,25 +25,35 @@ int FmultiMap(int val, int * _in, int * _out, uint8_t size)
   return (val - _in[pos-1]) * (_out[pos] - _out[pos-1]) / (_in[pos] - _in[pos-1]) + _out[pos-1];
 }
 
-//Calibrated distance sensor - SHARP 2D120X F 24
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// NEEDS MORE CALIBRATION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// when adding more values, remember to update size in the
+// FmultiMap(val, _in, _out, size) function
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 // out[] holds the values wanted in mm
 int out[] = {
-  367,347, 312, 305, 287,267,252,237,225,213,201,191,177,167,157,142,132,122,112,102,92,82,72,62,57,52,47,42,37,34,29};
+  300, 210, 190, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 25, 20};
 // in[] holds the measured analogRead() values for defined distances
 int in[]  = {
-  56,64,68,72,76,84,92,99,104,111,120,127,135,148,152,171,183,203,220,243,262,293,337,390,419,450,490,539,572,622,627};
+  72, 96, 100, 113, 116, 125, 129, 132, 137, 141, 148, 159, 181, 212, 256, 320, 360, 423};
+
 //-----------------------------------------------------------
 
 
+// Left back sensor (J1) -- A4
+// Left forward sensor (J2) -- A3
+// Front sensor (J3) -- A2
+// Right forward sensor (J4) -- A1
+// Right back sensor (J5) -- A0
+
+
+
 #include <Wire.h>
-#include <Adafruit_MotorShield.h>
-#include "utility/Adafruit_PWMServoDriver.h"
 #include <PololuWheelEncoders.h>
 #include <PID_v1.h>
 
-Adafruit_MotorShield AFMS = Adafruit_MotorShield();
-Adafruit_DCMotor *myMotor1 = AFMS.getMotor(1);
-Adafruit_DCMotor *myMotor2 = AFMS.getMotor(2);
 
 PololuWheelEncoders encoders;
 
@@ -61,43 +69,38 @@ void setup() {
 
 void loop(){
 
-  int sensorF=analogRead(A1);
-  int sensorL1=analogRead(A2);
-  int sensorL2=analogRead(A3);
-  int sensorR1=analogRead(A0);
-  int test=analogRead(A4);
-  int sensorR2=analogRead(A5);
-  int mm1 = FmultiMap(sensorF, in, out, 31);
-  int mm2 = FmultiMap(sensorL1, in, out, 31);
-  int mm3 = FmultiMap(sensorL2, in, out, 31);
-  int mm4 = FmultiMap(sensorR1, in, out, 31);
-  int mm5 = FmultiMap(sensorR2, in, out, 31);
-  int mmtest = FmultiMap(test, in, out, 31);
+  int sensorLb=analogRead(A4);
+  int sensorLf=analogRead(A3);
+  int sensorF=analogRead(A2);
+  int sensorRf=analogRead(A1);
+  int sensorRb=analogRead(A0);
 
-  Serial.print("Sensor F Value: ");
-  Serial.print(sensorF);
+  int mm1 = FmultiMap(sensorLb, in, out, 18);
+  int mm2 = FmultiMap(sensorLf, in, out, 18);
+  int mm3 = FmultiMap(sensorF, in, out, 18);
+  int mm4 = FmultiMap(sensorRf, in, out, 18);
+  int mm5 = FmultiMap(sensorRb, in, out, 18);
+
+  Serial.print("Left back sensor value: ");
+  Serial.print(sensorLb);
   Serial.print("   ");
   Serial.println(mm1);
-  Serial.print("Sensor L1 Value: ");
-  Serial.print(sensorL1);
+  Serial.print("Left forward sensor value: ");
+  Serial.print(sensorLf);
   Serial.print("   ");
   Serial.println(mm2);
-  Serial.print("Sensor L2 Value: ");
-  Serial.print(sensorL2);
+  Serial.print("Front sensor value: ");
+  Serial.print(sensorF);
   Serial.print("   ");
   Serial.println(mm3);
-  Serial.print("Sensor R1 Value: ");
-  Serial.print(sensorR1);
+  Serial.print("Right forward sensor value: ");
+  Serial.print(sensorRf);
   Serial.print("   ");
   Serial.println(mm4);
-  Serial.print("Sensor R2 Value: ");
-  Serial.print(sensorR2);
+  Serial.print("Right back sensor value: ");
+  Serial.print(sensorRb);
   Serial.print("   ");
   Serial.println(mm5);
-  Serial.print("Sensor test Value: ");
-  Serial.print(test);
-  Serial.print("   ");
-  Serial.print(mmtest);  
   Serial.println(" ");
 
   Serial.println(" ");

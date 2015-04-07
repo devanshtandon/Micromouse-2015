@@ -6,7 +6,7 @@ Status: Works, but needs more fine tuning
 
 Test the motor-encoder combination.
 
-Use the go(direction, counts) function to tell the robot
+Use the go(direction, distance) function to tell the robot
 which direction and how far (in encoder counts) to move.
 
 See CONSTANTS for the number of encoder counts per square (16.8cm)
@@ -108,8 +108,8 @@ void loop() {
 
 
 //Give a direction (FORWARD, BACKWARD, LEFT, or RIGHT)
-//and the number of encoder counts to move.
-void go(int direction, int counts) {
+//and a distance (in number of encoder counts) to move.
+void go(int direction, int distance) {
 
   PORTD &= B01110011; // stop first
   PORTB &= 255-(1<<0); 
@@ -142,7 +142,7 @@ void go(int direction, int counts) {
     PORTB |= (1<<0); 
   }
 
-  while(abs(countsM1) < counts || abs(countsM2) < counts) {
+  while(abs(countsM1) < distance || abs(countsM2) < distance) {
     countsM1 = encoders.getCountsM1();
     countsM2 = encoders.getCountsM2();
   }
