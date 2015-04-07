@@ -1,5 +1,6 @@
 /* micromouse2015.ino 
 Christopher Datsikas
+Devansh Tandon
 
 Created: 03-16-2015
 Last Modified: 03-22-2015
@@ -62,5 +63,19 @@ void setup() {
 }
 
 void loop() {
-// fill
+	// initialise maze
+	
+	// algorithm logic
+	
+	// forward one square function -- needs motor constants
+	
+	// turn functions -- motor constants
+	
+	// backward function -- motor constants
+
+	// get sensors function -- read the sensors and convert to cm
+	
+	// check wall -- use sensor data to populate data for the node
+
+	// get encoders -- encoder counts
 }
