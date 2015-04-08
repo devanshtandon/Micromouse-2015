@@ -96,10 +96,24 @@ const int TURNS=TURN;
 #include <PololuWheelEncoders.h>
 #include <PID_v1.h>
 
+//Define Variables we'll be connecting to
+double Setpoint = 0, Input, Output = 0;
+
+//Specify the links and initial tuning parameters
+PID myPID(&Input, &Output, &Setpoint, 2,5,1, DIRECT);
+
 PololuWheelEncoders encoders;
 
-int countsM1;
-int countsM2;
+// encoder counts
+double countsLeft;
+double countsRight;
+double speed = 75;
+double sensorValues[5];
+#define FRONT (0)
+#define LEFT_FRONT (1)
+#define LEFT_BACK (2)
+#define RIGHT_FRONT (3)
+#define RIGHT_BACK (4)
 
 void setup() {
   // enables Serial communication
@@ -116,8 +130,12 @@ void setup() {
   pinMode(STBY, OUTPUT);
   digitalWrite(STBY, HIGH);  // turns motor driver on
 
-  analogWrite(PWMA, 100);    // uses PWM to set motor speed
-  analogWrite(PWMB, 100);
+  // set up the PID
+  myPID.SetSampleTime(100);
+  myPID.SetOutputLimits(-255, 255);
+
+  analogWrite(PWMA, speed);    // uses PWM to set motor speed
+  analogWrite(PWMB, speed);
 
   Serial.println ("SETUP COMPELETE");
   delay(5000);
@@ -129,7 +147,10 @@ void loop() {
 	// algorithm logic
 
 	// get sensors function -- read the sensors and convert to cm
-	
+  // this should update the sensorValues array 
+	getSensors();
+
+
 	// check wall -- use sensor data to populate data for the node
 
 	// get encoders -- encoder counts
@@ -138,7 +159,18 @@ void loop() {
 // forward one square function -- needs motor constants
 // turn functions -- motor constants
 // backward function -- motor constants
+void forward (double speed, int encoderCount)
+{
+  double difference = sensorValues[1] - sensorValues[3];
 
+  // turn on PID
+  Input = difference;
+  myPID.SetMode(AUTOMATIC);
+  myPID.Compute();
+
+  analogWrite(PWMA, speed-Output);
+  analogWrite(PWMB, speed+Output);
+}
 
 //Give a direction (FORWARD, BACKWARD, LEFT, or RIGHT)
 //and the number of encoder counts to move.
@@ -148,8 +180,8 @@ void go(int direction, int counts) {
   PORTB &= 255-(1<<0); 
   encoders.getCountsAndResetM1();
   encoders.getCountsAndResetM2();
-  countsM1 = 0;
-  countsM2 = 0;
+  countsLeft = 0;
+  countsRight = 0;
 
   if (direction == FORWARD) {
     PORTD &= 255-(1<<3); 
@@ -175,9 +207,9 @@ void go(int direction, int counts) {
     PORTB |= (1<<0); 
   }
 
-  while(abs(countsM1) < counts || abs(countsM2) < counts) {
-    countsM1 = encoders.getCountsM1();
-    countsM2 = encoders.getCountsM2();
+  while(abs(countsLeft) < counts || abs(countsRight) < counts) {
+    countsLeft = encoders.getcountsLeft();
+    countsRight = encoders.getcountsRight();
   }
 
   PORTD &= B01110011; // stop
