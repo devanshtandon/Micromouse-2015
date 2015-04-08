@@ -161,15 +161,22 @@ void loop() {
 // backward function -- motor constants
 void forward (double speed, int encoderCount)
 {
-  double difference = sensorValues[1] - sensorValues[3];
+  while((abs(countsLeft+countsRight)/2) < encoderCount) 
+  {
+    // turn on PID
+    Input = sensorValues[1] - sensorValues[3];
+    myPID.SetMode(AUTOMATIC);
+    myPID.Compute();
 
-  // turn on PID
-  Input = difference;
-  myPID.SetMode(AUTOMATIC);
-  myPID.Compute();
+    analogWrite(PWMA, speed-Output);
+    analogWrite(PWMB, speed+Output);
 
-  analogWrite(PWMA, speed-Output);
-  analogWrite(PWMB, speed+Output);
+    countsLeft = encoders.getcountsLeft();
+    countsRight = encoders.getcountsRight();
+  }
+
+  PORTD &= B01110011; // stop
+  PORTB &= 255-(1<<0);
 }
 
 //Give a direction (FORWARD, BACKWARD, LEFT, or RIGHT)
