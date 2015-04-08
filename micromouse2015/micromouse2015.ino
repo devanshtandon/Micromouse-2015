@@ -50,6 +50,44 @@ BO2 -- M2 Encoder 2
 
 */
 
+
+//---------------------------------- Funcitons and Data required for Analog IR 
+//Float Multi Map function
+int FmultiMap(int val, int * _in, int * _out, uint8_t size)
+{
+  // take care the value is within range
+  // val = constrain(val, _in[0], _in[size-1]);
+  if (val <= _in[0]) return _out[0];
+  if (val >= _in[size-1]) return _out[size-1];
+
+  // search right interval
+  uint8_t pos = 1;  // _in[0] allready tested
+  while(val > _in[pos]) pos++;
+
+  // this will handle all exact "points" in the _in array
+  if (val == _in[pos]) return _out[pos];
+
+  // interpolate in the right segment for the rest
+  return (val - _in[pos-1]) * (_out[pos] - _out[pos-1]) / (_in[pos] - _in[pos-1]) + _out[pos-1];
+}
+
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// NEEDS MORE CALIBRATION !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// when adding more values, remember to update size in the
+// FmultiMap(val, _in, _out, size) function
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+// out[] holds the values wanted in mm
+int out[] = {
+  300, 210, 190, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 25, 20};
+// in[] holds the measured analogRead() values for defined distances
+int in[]  = {
+  72, 96, 100, 113, 116, 125, 129, 132, 137, 141, 148, 159, 181, 212, 256, 320, 360, 423};
+
+//-----------------------------------------------------------
+
+
 // Define pins for Motor Driver TB6612FNG
 #define PWMA 5
 #define PWMB 6
@@ -133,6 +171,7 @@ void setup() {
   // set up the PID
   myPID.SetSampleTime(100);
   myPID.SetOutputLimits(-255, 255);
+  myPID.SetMode(AUTOMATIC);
 
   analogWrite(PWMA, speed);    // uses PWM to set motor speed
   analogWrite(PWMB, speed);
@@ -142,6 +181,10 @@ void setup() {
 }
 
 void loop() {
+  
+  go(FORWARD,5*SQUARES);
+  go(BACKWARD,5*SQUARES);
+
 	// initialise maze
 	
 	// algorithm logic
@@ -156,64 +199,92 @@ void loop() {
 	// get encoders -- encoder counts
 }
 
-// forward one square function -- needs motor constants
-// turn functions -- motor constants
-// backward function -- motor constants
 
 
 //Give a direction (FORWARD, BACKWARD, LEFT, or RIGHT)
 //and the number of encoder counts to move.
 void go(int direction, int counts) {
 
-  PORTD &= B01110011; // stop first
-  PORTB &= 255-(1<<0); 
+  stopRobot();
   encoders.getCountsAndResetM1();
   encoders.getCountsAndResetM2();
   countsLeft = 0;
   countsRight = 0;
 
   if (direction == FORWARD) {
-    PORTD &= 255-(1<<3); 
-    PORTD |= B10000100;
-    PORTB &= 255-(1<<0); 
+    digitalWrite(AIN1, LOW);   // Left wheel forward
+    digitalWrite(AIN2, HIGH);
+    digitalWrite(BIN1, HIGH);  // Right wheel forward
+    digitalWrite(BIN2, LOW);  
   }
 
   else if (direction == BACKWARD) {
-    PORTD |= (1<<3);  
-    PORTD &= B01111011;
-    PORTB |= (1<<0);  
+    digitalWrite(AIN1, HIGH); // Left wheel reverse
+    digitalWrite(AIN2, LOW);
+    digitalWrite(BIN1, LOW);  // Right wheel reverse
+    digitalWrite(BIN2, HIGH);
   }
 
   else if (direction == LEFT) {
-    PORTD |= B10001000;
-    PORTD &= 255-(1<<2);
-    PORTB &= 255-(1<<0);
+    digitalWrite(AIN1, HIGH);  // Left wheel reverse
+    digitalWrite(AIN2, LOW);
+    digitalWrite(BIN1, HIGH);  // Right wheel forward
+    digitalWrite(BIN2, LOW);
   }
 
   else if (direction == RIGHT) {
-    PORTD &= B01110111;
-    PORTD |= (1<<2);
-    PORTB |= (1<<0); 
+    digitalWrite(AIN1, LOW);  // Left wheel forward
+    digitalWrite(AIN2, HIGH);
+    digitalWrite(BIN1, LOW);  // Right wheel reverse
+    digitalWrite(BIN2, HIGH);
   }
 
-  while(abs(countsLeft) < counts || abs(countsRight) < counts) {
-    // turn on PID
-    Input = sensorValues[1] - sensorValues[3];
-    myPID.SetMode(AUTOMATIC);
-    myPID.Compute();
+  if (direction == FORWARD || direction == BACKWARD) {
 
-    countsLeft = encoders.getcountsLeft();
-    countsRight = encoders.getcountsRight();
+    while(abs(countsLeft) < counts || abs(countsRight) < counts) {
+      
+      Input = sensorValues[1] - sensorValues[3];
+      myPID.Compute();
+      analogWrite(PWMA, Output);
 
-    getSensors();
+      countsLeft = encoders.getCountsM1();
+      countsRight = encoders.getCountsM2();
+
+      getSensors();
+    }
+
   }
 
-  PORTD &= B01110011; // stop
-  PORTB &= 255-(1<<0); 
+  else {
+
+    while(abs(countsLeft) < counts || abs(countsRight) < counts) {
+      countsLeft = encoders.getCountsM1();
+      countsRight = encoders.getCountsM2();
+    }
+
+  }
+
+
+  stopRobot();
 }
+
 
 // stop both motors and bring robot to a stop
 void stopRobot() {
-  PORTD &= B01110011; 
-  PORTB &= 255-(1<<0);
+  digitalWrite(AIN1, LOW);  // stop left wheel
+  digitalWrite(AIN2, LOW);
+  digitalWrite(BIN1, LOW);  // stop right wheel
+  digitalWrite(BIN2, LOW);  
+}
+
+
+
+void getSensors() {
+
+  sensorValues[LEFT_BACK] = FmultiMap(analogRead(A4), in, out, 18);
+  sensorValues[LEFT_FRONT] = FmultiMap(analogRead(A3), in, out, 18);
+  sensorValues[FRONT] = FmultiMap(analogRead(A2), in, out, 18);
+  sensorValues[RIGHT_FRONT] = FmultiMap(analogRead(A1), in, out, 18);
+  sensorValues[RIGHT_BACK] = FmultiMap(analogRead(A0), in, out, 18);
+
 }

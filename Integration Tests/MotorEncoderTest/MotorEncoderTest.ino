@@ -54,8 +54,8 @@ const int INT_COUNTS_PER_CM=93; // use int for faster arithmetic
 const int INT_COUNTS_PER_SQUARE=1559;
 const int SQUARE=1559;
 const int SQUARES=SQUARE;
-const int TURN=700;
-const int TURNS=TURN;
+const int RIGHT_TURN=630;
+const int LEFT_TURN=755;
 
 
 #include <PololuWheelEncoders.h>
@@ -79,29 +79,39 @@ void setup() {
   pinMode(STBY, OUTPUT);
   digitalWrite(STBY, HIGH);  // turns motor driver on
 
-  analogWrite(PWMA, 100);    // uses PWM to set motor speed
-  analogWrite(PWMB, 100);
+  analogWrite(PWMA, 100);    // left wheel 
+  analogWrite(PWMB, 100);  // right wheel
 }
 
 
 void loop() {
 
-  go(FORWARD,4*SQUARES);
-  delay(1000);
-  go(BACKWARD,4*SQUARES);
-  delay(1000);
+ go(FORWARD,1*SQUARE);
+// delay(500);
+ go(RIGHT,1*RIGHT_TURN);
+// delay(500);
 
-  go(FORWARD,1*SQUARE);
-  go(LEFT,1*TURN);
-  go(FORWARD,1*SQUARE);
-  go(RIGHT,1*TURN);
-  go(FORWARD,1*SQUARE);
-  go(RIGHT,1*TURN);
-  go(FORWARD,1*SQUARE);
-  go(RIGHT,1*TURN);
-  go(FORWARD,2*SQUARES);
-  go(LEFT,2*TURNS);
-  delay(1000);
+  // Serial.print(PololuWheelEncoders::getCountsM1());
+  // Serial.print("   ");
+  // Serial.println(PololuWheelEncoders::getCountsM2());
+  // delay(200);
+
+  // go(FORWARD,4*SQUARES);
+  // delay(1000);
+  // go(BACKWARD,4*SQUARES);
+  // delay(1000);
+
+  // go(FORWARD,1*SQUARE);
+  // go(LEFT,1*TURN);
+  // go(FORWARD,1*SQUARE);
+  // go(RIGHT,1*TURN);
+  // go(FORWARD,1*SQUARE);
+  // go(RIGHT,1*TURN);
+  // go(FORWARD,1*SQUARE);
+  // go(RIGHT,1*TURN);
+  // go(FORWARD,2*SQUARES);
+  // go(LEFT,2*TURNS);
+  // delay(1000);
 }
 
 
