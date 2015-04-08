@@ -94,6 +94,8 @@ const int TURNS=TURN;
 
 
 #include <PololuWheelEncoders.h>
+#include <PID_v1.h>
+
 PololuWheelEncoders encoders;
 
 int countsM1;
