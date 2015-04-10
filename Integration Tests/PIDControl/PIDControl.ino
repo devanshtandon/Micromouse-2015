@@ -92,6 +92,7 @@ int in[]  = {
 #define BIN2 8
 
 #define STBY 4
+#define DEBUG (A5)
 
 
 // Define directions
@@ -158,6 +159,7 @@ void setup() {
   pinMode(BIN1, OUTPUT);
   pinMode(BIN2, OUTPUT);
   pinMode(STBY, OUTPUT);
+  pinMode(DEBUG, OUTPUT);
   digitalWrite(STBY, HIGH);  // turns motor driver on
 
   // set up the PID
@@ -279,6 +281,7 @@ void go(int direction, int counts) {
           input=leftDistance - 32;
           myPID.SetMode(pidSwitch);
           leftDistance=0;
+          digitalWrite(DEBUG, HIGH);
         }
         else if ((READ_SENSOR(RIGHT_FRONT) < 37) && (READ_SENSOR(RIGHT_BACK) < 37)) {
           // we are close to the right wall
@@ -289,6 +292,7 @@ void go(int direction, int counts) {
           input = rightDistance - 32;
           myPID.SetMode(pidSwitch);
           rightDistance=0;
+          digitalWrite(DEBUG, HIGH);
         }
         else {
           myPID.SetMode(MANUAL);
