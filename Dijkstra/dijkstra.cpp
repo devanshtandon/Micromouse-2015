@@ -11,8 +11,8 @@
 #include <inttypes.h>
 #define START_SIZE (512)
 #define INFINITY (255)
-#define MAZE_WIDTH (16)
-#define MAZE_HEIGHT (16)
+#define MAZE_WIDTH (6)
+#define MAZE_HEIGHT (6)
 #define PATH_LENGTH (100)
 
 // finds child 0 or child 1 of x (dir = 0 or 1, respectively)
@@ -148,15 +148,18 @@ public:
     {
         pqueue = new PriorityQueue(START_SIZE);
         // initialize two dimensional graph
-        this->nodes = (struct node ***) malloc(sizeof(*(this->nodes))*MAZE_WIDTH);
-        for(int i=0; i<=MAZE_WIDTH; i++) {
-            this->nodes[i] = (struct node **) malloc(sizeof(*(this->nodes[i]))*MAZE_HEIGHT);
+        this->nodes = (struct node ***) calloc(MAZE_WIDTH, sizeof(*(this->nodes)));
+        for(int i=0; i<MAZE_WIDTH; i++) {
+            this->nodes[i] = (struct node **) calloc(MAZE_HEIGHT, sizeof(*(this->nodes[i])));
+            for(int j=0; j<MAZE_HEIGHT; j++) {
+                this->nodes[i][j] = (struct node *) malloc(sizeof(*(this->nodes[i][j])));
+            }
         }
     }
     
     ~Graph()
     {
-        for(int i=0; i<=MAZE_WIDTH; i++) {
+        for(int i=0; i<MAZE_WIDTH; i++) {
             free(this->nodes[i]);
         }
         free(this->nodes);
@@ -165,7 +168,6 @@ public:
     
     void
     addNode(int x, int y, bool north, bool east, bool south, bool west) {
-        this->nodes[x][y] = (struct node *) malloc(sizeof(*(this->nodes[x][y])));
         this->nodes[x][y]->x = x;
         this->nodes[x][y]->y = y;
         
@@ -178,7 +180,7 @@ public:
     coord **
     shortestPath(coord start, coord finish) {
         int i, alt;
-        struct coord neighbor, **path, *pathpt;
+        struct coord neighbor, swap, **path, *pathpt;
         struct node* smallest;
         
         for(int j = 0; j < MAZE_WIDTH; j++) {
@@ -207,6 +209,14 @@ public:
                     path[i] = pathpt;
                     smallest = smallest->previous;
                 }
+                
+                // reverse path array
+                for(int j=0; j<((i-1)/2); j++) {
+                    swap = *path[j];
+                    *path[j] = *path[i-j-1];
+                    *path[i-j-1] = swap;
+                }
+                
                 for(; i < PATH_LENGTH; i++) {
                     path[i] = NULL;
                 }
@@ -265,16 +275,16 @@ int main(int argc, char **argv) {
             N = S = E = W = 0;
             if(i == 0) W = true;
             if(j == 0) S = true;
-            if(i == 15) E = true;
-            if(j == 15) N = true;
+            if(i == 5) E = true;
+            if(j == 5) N = true;
             maze->addNode(i, j, N, E, S, W);
         }
     }
     
     start.x = 0;
     start.y = 0;
-    finish.x = 15;
-    finish.y = 15;
+    finish.x = 5;
+    finish.y = 5;
     
     path = maze->shortestPath(start, finish);
     

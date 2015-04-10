@@ -120,7 +120,7 @@ class State
     ~State() {}
     
     void
-    updateState(direction)
+    update(direction)
     {
         int increment;
         switch (direction) {
@@ -441,12 +441,112 @@ void detectWalls() {
 #define MAZE_HEIGHT (16)
 #define PATH_LENGTH (100)
 
-int
-getDirections(struct coord start, struct coord finish)
+void
+moveLeft()
 {
-    struct coord **path;
+    go(LEFT, 0);
+    state->update(LEFT);
+    go(FORWARD, SQUARE);
+    state->update(FORWARD);
+}
+
+void moveRight()
+{
+    go(RIGHT, 0);
+    state->update(RIGHT);
+    go(FORWARD, SQUARE);
+    state->update(FORWARD);
+    break;
+
+}
+
+void moveForward()
+{
+    go(FORWARD, SQUARE);
+    state->update(FORWARD);
+}
+
+void moveBackward()
+{
+    go(RIGHT, 0);
+    state->update(RIGHT);
+    go(RIGHT, 0);
+    state->update(RIGHT);
+    go(FORWARD, SQUARE);
+    state->update(FORWARD);
+}
+
+int
+nextMove(struct coord start, struct coord finish)
+{
+    struct coord diff, **path;
     
     path = maze->shortestPath(start, finish);
+    
+    diff.x = path[0]->x - state->x;
+    diff.y = path[0]->y - state->y;
+    
+    if(diff.x && diff.x > 0) {
+        switch (state->orientation) {
+            case NORTH:
+                moveRight();
+                break;
+            case EAST:
+                moveForward();
+                break;
+            case SOUTH:
+                moveLeft();
+                break;
+            case WEST:
+                moveBackward();
+                break;
+        }
+    } else(diff.x && diff.x < 0) {
+        switch (state->orientation) {
+            case NORTH:
+                moveLeft();
+                break;
+            case EAST:
+                moveBackward();
+                break;
+            case SOUTH:
+                moveRight();
+                break;
+            case WEST:
+                moveForward();
+                break;
+        }
+    } else(diff.y && diff.y > 0) {
+        switch (state->orientation) {
+            case NORTH:
+                moveForward();
+                break;
+            case EAST:
+                moveLeft();
+                break;
+            case SOUTH:
+                moveBackward();
+                break;
+            case WEST:
+                moveRight();
+                break;
+        }
+    } else(diff.y && diff.y < 0) {
+        switch (state->orientation) {
+            case NORTH:
+                moveBackward();
+                break;
+            case EAST:
+                moveRight();
+                break;
+            case SOUTH:
+                moveForward();
+                break;
+            case WEST:
+                moveLeft();
+                break;
+        }
+    }
     
     free(path);
 }
@@ -562,15 +662,18 @@ public:
     {
         pqueue = new PriorityQueue(START_SIZE);
         // initialize two dimensional graph
-        this->nodes = (struct node ***) malloc(sizeof(*(this->nodes))*MAZE_WIDTH);
-        for(int i=0; i<=MAZE_WIDTH; i++) {
-            this->nodes[i] = (struct node **) malloc(sizeof(*(this->nodes[i]))*MAZE_HEIGHT);
+        this->nodes = (struct node ***) calloc(MAZE_WIDTH, sizeof(*(this->nodes)));
+        for(int i=0; i<MAZE_WIDTH; i++) {
+            this->nodes[i] = (struct node **) calloc(MAZE_HEIGHT, sizeof(*(this->nodes[i])));
+            for(int j=0; j<MAZE_HEIGHT; j++) {
+                this->nodes[i][j] = (struct node *) malloc(sizeof(*(this->nodes[i][j])));
+            }
         }
     }
     
     ~Graph()
     {
-        for(int i=0; i<=MAZE_WIDTH; i++) {
+        for(int i=0; i<MAZE_WIDTH; i++) {
             free(this->nodes[i]);
         }
         free(this->nodes);
@@ -579,7 +682,6 @@ public:
     
     void
     addNode(int x, int y, bool north, bool east, bool south, bool west) {
-        this->nodes[x][y] = (struct node *) malloc(sizeof(*(this->nodes[x][y])));
         this->nodes[x][y]->x = x;
         this->nodes[x][y]->y = y;
         
@@ -592,7 +694,7 @@ public:
     coord **
     shortestPath(coord start, coord finish) {
         int i, alt;
-        struct coord neighbor, **path, *pathpt;
+        struct coord neighbor, swap, **path, *pathpt;
         struct node* smallest;
         
         for(int j = 0; j < MAZE_WIDTH; j++) {
@@ -621,6 +723,14 @@ public:
                     path[i] = pathpt;
                     smallest = smallest->previous;
                 }
+                
+                // reverse path array
+                for(int j=0; j<((i-1)/2); j++) {
+                    swap = *path[j];
+                    *path[j] = *path[i-j-1];
+                    *path[i-j-1] = swap;
+                }
+                
                 for(; i < PATH_LENGTH; i++) {
                     path[i] = NULL;
                 }
@@ -637,7 +747,7 @@ public:
                             // no north wall
                         case 0:
                             neighbor.x = smallest->x;
-                            neighbor.y = smallest->y - 1;
+                            neighbor.y = smallest->y + 1;
                             break;
                             // no east wall
                         case 1:
@@ -647,7 +757,7 @@ public:
                             // no south wall
                         case 2:
                             neighbor.x = smallest->x;
-                            neighbor.y = smallest->y + 1;
+                            neighbor.y = smallest->y - 1;
                             break;
                             // no west wall
                         case 3:
