@@ -34,10 +34,10 @@ int FmultiMap(int val, int * _in, int * _out, uint8_t size)
 
 // out[] holds the values wanted in mm
 int out[] = {
-  300, 210, 190, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 25, 20};
+  300, 210, 190, 150, 140, 130, 120, 110, 100, 90, 80, 70, 60, 50, 40, 30, 25, 20, 15, 10};
 // in[] holds the measured analogRead() values for defined distances
 int in[]  = {
-  72, 96, 100, 113, 116, 125, 129, 132, 137, 141, 148, 159, 181, 212, 256, 320, 360, 423};
+  72, 96, 100, 113, 116, 125, 129, 132, 137, 141, 148, 159, 181, 212, 256, 320, 360, 423, 500, 570};
 
 //-----------------------------------------------------------
 
@@ -54,6 +54,7 @@ int in[]  = {
 #include <PololuWheelEncoders.h>
 #include <PID_v1.h>
 
+#define CALIBRATION_ARRAY_SIZE 20
 
 PololuWheelEncoders encoders;
 
@@ -75,11 +76,11 @@ void loop(){
   int sensorRf=analogRead(A1);
   int sensorRb=analogRead(A0);
 
-  int mm1 = FmultiMap(sensorLb, in, out, 18);
-  int mm2 = FmultiMap(sensorLf, in, out, 18);
-  int mm3 = FmultiMap(sensorF, in, out, 18);
-  int mm4 = FmultiMap(sensorRf, in, out, 18);
-  int mm5 = FmultiMap(sensorRb, in, out, 18);
+  int mm1 = FmultiMap(sensorLb, in, out, CALIBRATION_ARRAY_SIZE);
+  int mm2 = FmultiMap(sensorLf, in, out, CALIBRATION_ARRAY_SIZE);
+  int mm3 = FmultiMap(sensorF, in, out, CALIBRATION_ARRAY_SIZE);
+  int mm4 = FmultiMap(sensorRf, in, out, CALIBRATION_ARRAY_SIZE);
+  int mm5 = FmultiMap(sensorRb, in, out, CALIBRATION_ARRAY_SIZE);
 
   Serial.print("Left back sensor value: ");
   Serial.print(sensorLb);
@@ -102,6 +103,11 @@ void loop(){
   Serial.print("   ");
   Serial.println(mm5);
   Serial.println(" ");
+
+  Serial.print("diffFront: ");
+  Serial.println(mm2-mm4);
+  Serial.print("diffBack: ");
+  Serial.println(mm1-mm5);
 
   Serial.println(" ");
   delay(3000);
