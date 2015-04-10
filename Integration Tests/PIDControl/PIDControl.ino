@@ -261,17 +261,17 @@ void go(int direction, int counts) {
       if(currentMillis - previousMillis > 20) {
         previousMillis = currentMillis; // save the last time you blinked the LED
         delay(1);
-        diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
-        diffBack += READ_SENSOR(LEFT_BACK)-READ_SENSOR(RIGHT_BACK);
         wallClose=checkWall();
-        counter=counter+1;
-        if (counter==3) {
-          input=diff/3;
-          diff=0;
-          counter=0;
+        for (int i=0; i<3; i++) {
+          diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
+          diffBack += READ_SENSOR(LEFT_BACK)-READ_SENSOR(RIGHT_BACK);
         }
+        // input here is 2 wall PID
+        diff /= 3;
+        diffBack /= 3;
+        input = diff;
       }
-
+      
       if ((abs(input)>50) || abs(diffBack-diff)>37) {
         // one wall is missing
         if((READ_SENSOR(LEFT_FRONT) < 37) && (READ_SENSOR(LEFT_BACK) < 37)) {
