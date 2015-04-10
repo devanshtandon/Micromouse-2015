@@ -110,15 +110,15 @@ int in[]  = {
 #define RIGHT_BACK (0)
 #define READ_SENSOR(c) (FmultiMap(analogRead(c), in, out, 18))
 double sensorValues[5];
-boolean walls[4] = {false, false, false, false};
-#define LEFT_WALL walls[0]
-#define FRONT_WALL walls[1]
-#define RIGHT_WALL walls[2]
-#define BACK_WALL walls[3]
-// 0 -- Left
-// 1 -- Front
-// 2 -- Right
-// 2 -- Back
+//boolean walls[4] = {false, false, false, false};
+//#define LEFT_WALL walls[0]
+//#define FRONT_WALL walls[1]
+//#define RIGHT_WALL walls[2]
+//#define BACK_WALL walls[3]
+//// 0 -- Left
+//// 1 -- Front
+//// 2 -- Right
+//// 2 -- Back
 
 
 // MOTOR CONTROL CONSTANTS: NEEDS FINE-TUNING
@@ -176,35 +176,35 @@ void loop() {
 //   turnLeft();
 //   delay(2000);
 
-//   forwardOneSquare();
-//   delay(2000);
-//   forwardOneSquare();
-//   delay(2000);
-//   forwardOneSquare();
-//   delay(2000);
-//   forwardOneSquare();
-//   delay(2000);
-//   turnLeft();
-//   delay(2000);
-//   forwardOneSquare();
-//   delay(2000);
-//   turnLeft();
-//   delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   turnLeft();
+   delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   turnLeft();
+   delay(2000);
 
-   forwardOneSquare();
- //  delay(2000);
-   forwardOneSquare();
- //  delay(2000);
-   forwardOneSquare();
- //  delay(2000);
-   forwardOneSquare();
- //  delay(2000);
-   turnLeft();
- //  delay(2000);
-   forwardOneSquare();
- //  delay(2000);
-   turnLeft();
- //  delay(2000);
+//   forwardOneSquare();
+// //  delay(2000);
+//   forwardOneSquare();
+// //  delay(2000);
+//   forwardOneSquare();
+// //  delay(2000);
+//   forwardOneSquare();
+// //  delay(2000);
+//   turnLeft();
+// //  delay(2000);
+//   forwardOneSquare();
+// //  delay(2000);
+//   turnLeft();
+// //  delay(2000);
 
 }
 
@@ -238,6 +238,7 @@ void go(int direction, int counts) {
   setMotorSpeeds(spL,spR);
   setMotorDirection(direction);
   getSensors();
+  boolean wallClose=false;
 
   // if (sensorValues[FRONT] < WALL_THRESHOLD) FRONT_WALL = true;
   // if (sensorValues[LEFT_FRONT] < WALL_THRESHOLD) LEFT_WALL = true;
@@ -247,8 +248,6 @@ void go(int direction, int counts) {
 
     int diff=0;
     int counter = 0;
-    boolean wallClose=false;
-
     while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  //1487
       getEncoders();
       unsigned long currentMillis = millis();
