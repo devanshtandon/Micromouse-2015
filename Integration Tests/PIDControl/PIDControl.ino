@@ -255,6 +255,7 @@ void go(int direction, int counts) {
         previousMillis = currentMillis; // save the last time you blinked the LED
         delay(1);
         diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
+        diffBack += READ_SENSOR(LEFT_BACK)-READ_SENSOR(RIGHT_BACK);
         wallClose=checkWall();
         counter=counter+1;
         if (counter==3) {
@@ -263,8 +264,27 @@ void go(int direction, int counts) {
           counter=0;
         }
       }
-      if (abs(input) >50) myPID.SetMode(MANUAL);
-      else myPID.SetMode(pidSwitch);
+
+      if ((abs(input)>50) || abs(diffBack-diff)>37) {
+        // one wall is missing
+        if((READ_SENSOR(LEFT_FRONT) < 37) && (READ_SENSOR(LEFT_BACK) < 37)) {
+          // we are close to left wall
+          int leftDistance = (READ_SENSOR(LEFT_FRONT) + READ_SENSOR(LEFT_BACK))/2;
+          input = leftDistance - 32;
+          myPID.setMode(pidSwitch);
+        }
+        else if ((READ_SENSOR(RIGHT_FRONT) < 37) && (READ_SENSOR(RIGHT_BACK) < 37)) {
+          // we are close to the right wall
+          int rightDistance = (READ_SENSOR(RIGHT_FRONT) + READ_SENSOR(RIGHT_BACK))/2;
+          input = rightDistance - 32;
+          myPID.setMode(pidSwitch);
+        }
+        else {
+          myPID.SetMode(MANUAL);
+        }
+      }
+
+      else myPID.SetMode(pidSwitch); // there are 2 walls close to us
 
       myPID.Compute(); 
       setMotorSpeeds(constrain(spL+output,0,255),constrain(spR-output,0,255));
@@ -285,7 +305,12 @@ void go(int direction, int counts) {
       wallClose = checkWall();
     }
 
+    stopRobot();
+    delay(1000);
+    resetEncoders();
+    setMotorSpeeds(spL,spR);
     setMotorDirection(direction);
+
     while(abs(enCountsL)<counts) {
       enCountsL = encoders.getCountsM1();
       enCountsR = encoders.getCountsM2();
