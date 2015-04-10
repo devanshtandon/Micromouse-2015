@@ -125,7 +125,7 @@ double sensorValues[5];
 // MOTOR CONTROL CONSTANTS: NEEDS FINE-TUNING
 const int COUNTS_PER_CM=93; 
 const int SQUARE=1780;  // 1750
-const int TURN=770;     // 795
+const int TURN=780;     // 795
 double spL = 74;
 double spR = 73;
 
@@ -160,6 +160,7 @@ void setup() {
   pinMode(BIN2, OUTPUT);
   pinMode(STBY, OUTPUT);
   pinMode(DEBUG, OUTPUT);
+  digitalWrite(DEBUG, HIGH);
   digitalWrite(STBY, HIGH);  // turns motor driver on
 
   // set up the PID
@@ -174,24 +175,24 @@ void setup() {
 
 void loop() {
   
-//  wallFollow();
+  wallFollow();
 //   turnLeft();
 //   delay(2000);
 
-   forwardOneSquare();
-   delay(2000);
-   forwardOneSquare();
-   delay(2000);
-   forwardOneSquare();
-   delay(2000);
-   forwardOneSquare();
-   delay(2000);
-   turnLeft();
-   delay(2000);
-   forwardOneSquare();
-   delay(2000);
-   turnLeft();
-   delay(2000);
+   // forwardOneSquare();
+   // delay(2000);
+   // forwardOneSquare();
+   // delay(2000);
+   // forwardOneSquare();
+   // delay(2000);
+   // forwardOneSquare();
+   // delay(2000);
+   // turnLeft();
+   // delay(2000);
+   // forwardOneSquare();
+   // delay(2000);
+   // turnLeft();
+   // delay(2000);
 
 //   forwardOneSquare();
 // //  delay(2000);
@@ -299,7 +300,10 @@ void go(int direction, int counts) {
         }
       }
 
-      else myPID.SetMode(pidSwitch); // there are 2 walls close to us
+      else {
+        myPID.SetMode(pidSwitch); // there are 2 walls close to us
+        digitalWrite(13, HIGH);
+      }
 
       myPID.Compute(); 
       setMotorSpeeds(constrain(spL+output,0,255),constrain(spR-output,0,255));
@@ -382,42 +386,18 @@ void resetEncoders() {
 void wallFollow() {
 
   while(1) {
-    setMotorDirection(FORWARD);
-    setMotorSpeeds(spL,spR);
-    int diff=0;
-    int counter = 0;
-    boolean wallClose=false;
-    while (!wallClose) { 
-      unsigned long currentMillis = millis();
-      if(currentMillis - previousMillis > 20) {
-        previousMillis = currentMillis; 
-        delay(1);
-        diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
-        wallClose=checkWall();
-        counter++;
-        if (counter==3) {
-          input=diff/3;
-          diff=0;
-          counter=0;
-        }
-      }
-
-      if (abs(input) >50) myPID.SetMode(MANUAL);
-      else myPID.SetMode(pidSwitch);
-
-      myPID.Compute(); 
-      setMotorSpeeds(constrain(spL+output,0,255),constrain(spR-output,0,255));
+    if (!checkWall())
+      forwardOneSquare();
+    else {
+      getSensors();
+      if (sensorValues[LEFT_FRONT] > 40 && sensorValues[LEFT_BACK] > 40)
+        turnLeft();
+      else if (sensorValues[RIGHT_FRONT] > 40 && sensorValues[RIGHT_BACK] > 40)
+        turnRight();
+      else
+        turnAround();
     }
-
-    stopRobot();
-
-    getSensors();
-    if (sensorValues[LEFT_FRONT] > 40 && sensorValues[LEFT_BACK] > 40)
-      turnLeft();
-    else if (sensorValues[RIGHT_FRONT] > 40 && sensorValues[RIGHT_BACK] > 40)
-      turnRight();
-    else
-      turnAround();
+    delay(1000);
   }
 
 }
