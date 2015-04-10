@@ -247,6 +247,7 @@ void go(int direction, int counts) {
   if (direction == FORWARD) {
 
     int diff=0;
+    int diffBack=0;
     int counter = 0;
     while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  //1487
       getEncoders();
@@ -271,13 +272,13 @@ void go(int direction, int counts) {
           // we are close to left wall
           int leftDistance = (READ_SENSOR(LEFT_FRONT) + READ_SENSOR(LEFT_BACK))/2;
           input = leftDistance - 32;
-          myPID.setMode(pidSwitch);
+          myPID.SetMode(pidSwitch);
         }
         else if ((READ_SENSOR(RIGHT_FRONT) < 37) && (READ_SENSOR(RIGHT_BACK) < 37)) {
           // we are close to the right wall
           int rightDistance = (READ_SENSOR(RIGHT_FRONT) + READ_SENSOR(RIGHT_BACK))/2;
           input = rightDistance - 32;
-          myPID.setMode(pidSwitch);
+          myPID.SetMode(pidSwitch);
         }
         else {
           myPID.SetMode(MANUAL);
