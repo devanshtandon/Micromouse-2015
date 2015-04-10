@@ -229,7 +229,9 @@ void turnLeft() {
 }
 
 void turnAround() {
-  go(LEFT, 2*TURN);
+  go(LEFT, 1*TURN);
+  delay(1000);
+  go(LEFT, 1*TURN);
 }
 
 //Give a direction (FORWARD, BACKWARD, LEFT, or RIGHT)
@@ -394,9 +396,9 @@ void wallFollow() {
       forwardOneSquare();
     else {
       getSensors();
-      if (sensorValues[LEFT_FRONT] > 40 && sensorValues[LEFT_BACK] > 40)
+      if (sensorValues[LEFT_FRONT] > 45 && sensorValues[LEFT_BACK] > 45)
         turnLeft();
-      else if (sensorValues[RIGHT_FRONT] > 40 && sensorValues[RIGHT_BACK] > 40)
+      else if (sensorValues[RIGHT_FRONT] > 45 && sensorValues[RIGHT_BACK] > 45)
         turnRight();
       else
         turnAround();
