@@ -132,7 +132,7 @@ double spR = 73;
 #include <PID_v1.h>
 double setpoint = 0, input, output = 0;
 long previousMillis = 0;
-PID myPID(&input, &output, &setpoint,.15,.10,.05, DIRECT);
+PID myPID(&input, &output, &setpoint,.20,.10,.05, DIRECT);
 boolean pidSwitch=AUTOMATIC;
 
 
@@ -248,6 +248,8 @@ void go(int direction, int counts) {
 
     int diff=0;
     int diffBack=0;
+    int rightDistance=0;
+    int leftDistance=0;
     int counter = 0;
     while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  //1487
       getEncoders();
@@ -270,15 +272,23 @@ void go(int direction, int counts) {
         // one wall is missing
         if((READ_SENSOR(LEFT_FRONT) < 37) && (READ_SENSOR(LEFT_BACK) < 37)) {
           // we are close to left wall
-          int leftDistance = (READ_SENSOR(LEFT_FRONT) + READ_SENSOR(LEFT_BACK))/2;
-          input = leftDistance - 32;
+          for (int i=0; i<3; i++) {
+            leftDistance += (READ_SENSOR(LEFT_FRONT) + READ_SENSOR(LEFT_BACK))/2;
+          }
+          leftDistance /= 3;
+          input=leftDistance - 32;
           myPID.SetMode(pidSwitch);
+          leftDistance=0;
         }
         else if ((READ_SENSOR(RIGHT_FRONT) < 37) && (READ_SENSOR(RIGHT_BACK) < 37)) {
           // we are close to the right wall
-          int rightDistance = (READ_SENSOR(RIGHT_FRONT) + READ_SENSOR(RIGHT_BACK))/2;
+          for(int i=0; i<3; i++) {
+            rightDistance += (READ_SENSOR(RIGHT_FRONT) + READ_SENSOR(RIGHT_BACK))/2;
+          }
+          rightDistance /= 3;
           input = rightDistance - 32;
           myPID.SetMode(pidSwitch);
+          rightDistance=0;
         }
         else {
           myPID.SetMode(MANUAL);
