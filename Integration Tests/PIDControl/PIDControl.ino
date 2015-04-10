@@ -280,10 +280,12 @@ void go(int direction, int counts) {
       // int diff=0;
       // diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
       // myPID.Compute(); 
+      setMotorDirection(FORWARD);
       setMotorSpeeds(constrain(spL,0,255),constrain(spR,0,255));
       wallClose = checkWall();
     }
 
+    setMotorDirection(direction);
     while(abs(enCountsL)<counts) {
       enCountsL = encoders.getCountsM1();
       enCountsR = encoders.getCountsM2();
