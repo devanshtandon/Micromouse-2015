@@ -1,22 +1,18 @@
 /* micromouse2015.ino 
 Christopher Datsikas
 Devansh Tandon
-
 Created: 03-16-2015
 Last Modified: 03-22-2015
 Status: In Progress
 Arduino Code for Micromouse for 
 2015 Brown IEEE Robotics Competition
-
 Github: https://github.com/devanshtandon/Micromouse-2015
 Upverter: https://upverter.com/chrisdats/26efdb039ba46d67/Micromouse2015/
-
 Components:
 - TB6612FNG Dual Motor Driver Carrier - https://www.pololu.com/product/713
 - 75:1 Micro Metal Gearmotor HP with Extended Motor Shaft - https://www.pololu.com/product/2215
 - Sharp GP2Y0A51SK0F Analog Distance Sensor 2-15cm - https://www.pololu.com/product/2450
 - Magnetic Encoders 12 CPR https://www.pololu.com/product/2598
-
 Connections:
 ARD -- OTHER COMPONEENTS
 D2  -- AIN2 Motor Driver
@@ -26,28 +22,21 @@ D5 (pwm) -- PWMA Motor Driver
 D6 (pwm) -- PWMB Motor Driver
 D7  -- BIN1 Motor Driver
 D8  -- BIN2 Motor Driver
-
 D9  -- OUTA Encoder 1
 D10 -- OUTB Encoder 1
-
 D11 -- OUTB Encoder 2 // this looks switched
 D12 -- OUTA Encoder 2 // done on purpose; to make pcb easier
-
 A0  -- J5 Sharp Distance Sensor (rightmost)
 A1  -- J4 Sharp Distance Sensor
 A2  -- J3 Sharp Distance Sensor
 A3  -- J2 Sharp Distance Sensor
 A4  -- J1 Sharp Distance Sensor (leftmost
-
 GND -- GND // make sure all grounds are connected
-
 MOTOR DRIVER -- ENCODERS
 AO1 -- M1 Encoder 1
 AO2 -- M2 Encoder 1
-
 BO1 -- M1 Encoder 2
 BO2 -- M2 Encoder 2
-
 */
 
 
@@ -92,7 +81,6 @@ int in[]  = {
 #define BIN2 8
 
 #define STBY 4
-#define DEBUG (A5)
 
 
 // Define directions
@@ -125,7 +113,7 @@ double sensorValues[5];
 // MOTOR CONTROL CONSTANTS: NEEDS FINE-TUNING
 const int COUNTS_PER_CM=93; 
 const int SQUARE=1780;  // 1750
-const int TURN=780;     // 795
+const int TURN=770;     // 795
 double spL = 74;
 double spR = 73;
 
@@ -133,7 +121,7 @@ double spR = 73;
 #include <PID_v1.h>
 double setpoint = 0, input, output = 0;
 long previousMillis = 0;
-PID myPID(&input, &output, &setpoint,.20,.10,.05, DIRECT);
+PID myPID(&input, &output, &setpoint,.15,.10,.05, DIRECT);
 boolean pidSwitch=AUTOMATIC;
 
 
@@ -159,7 +147,6 @@ void setup() {
   pinMode(BIN1, OUTPUT);
   pinMode(BIN2, OUTPUT);
   pinMode(STBY, OUTPUT);
-  pinMode(DEBUG, OUTPUT);
   digitalWrite(STBY, HIGH);  // turns motor driver on
 
   // set up the PID
@@ -174,24 +161,24 @@ void setup() {
 
 void loop() {
   
-  wallFollow();
+//  wallFollow();
 //   turnLeft();
 //   delay(2000);
 
-   // forwardOneSquare();
-   // delay(2000);
-   // forwardOneSquare();
-   // delay(2000);
-   // forwardOneSquare();
-   // delay(2000);
-   // forwardOneSquare();
-   // delay(2000);
-   // turnLeft();
-   // delay(2000);
-   // forwardOneSquare();
-   // delay(2000);
-   // turnLeft();
-   // delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   turnLeft();
+   delay(2000);
+   forwardOneSquare();
+   delay(2000);
+   turnLeft();
+   delay(2000);
 
 //   forwardOneSquare();
 // //  delay(2000);
@@ -229,9 +216,7 @@ void turnLeft() {
 }
 
 void turnAround() {
-  go(LEFT, 1*TURN);
-  delay(1000);
-  go(LEFT, 1*TURN);
+  go(LEFT, 2*TURN);
 }
 
 //Give a direction (FORWARD, BACKWARD, LEFT, or RIGHT)
@@ -251,9 +236,6 @@ void go(int direction, int counts) {
   if (direction == FORWARD) {
 
     int diff=0;
-    int diffBack=0;
-    int rightDistance=0;
-    int leftDistance=0;
     int counter = 0;
     while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  //1487
       getEncoders();
@@ -261,61 +243,23 @@ void go(int direction, int counts) {
       if(currentMillis - previousMillis > 20) {
         previousMillis = currentMillis; // save the last time you blinked the LED
         delay(1);
+        diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
         wallClose=checkWall();
-        for (int i=0; i<3; i++) {
-          diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
-          diffBack += READ_SENSOR(LEFT_BACK)-READ_SENSOR(RIGHT_BACK);
-        }
-        // input here is 2 wall PID
-        diff /= 3;
-        diffBack /= 3;
-        input = diff;
-      }
-      
-      if ((abs(input)>50) || abs(diffBack-diff)>37) {
-        // one wall is missing
-        if((READ_SENSOR(LEFT_FRONT) < 37) && (READ_SENSOR(LEFT_BACK) < 37)) {
-          // we are close to left wall
-          for (int i=0; i<3; i++) {
-            leftDistance += (READ_SENSOR(LEFT_FRONT) + READ_SENSOR(LEFT_BACK))/2;
-          }
-          leftDistance /= 3;
-          input=leftDistance - 32;
-          myPID.SetMode(pidSwitch);
-          leftDistance=0;
-          digitalWrite(DEBUG, HIGH);
-          digitalWrite(13, LOW);
-        }
-        else if ((READ_SENSOR(RIGHT_FRONT) < 37) && (READ_SENSOR(RIGHT_BACK) < 37)) {
-          // we are close to the right wall
-          for(int i=0; i<3; i++) {
-            rightDistance += (READ_SENSOR(RIGHT_FRONT) + READ_SENSOR(RIGHT_BACK))/2;
-          }
-          rightDistance /= 3;
-          input = rightDistance - 32;
-          myPID.SetMode(pidSwitch);
-          rightDistance=0;
-          digitalWrite(DEBUG, HIGH);
-          digitalWrite(13, LOW);
-        }
-        else {
-          myPID.SetMode(MANUAL);
+        counter=counter+1;
+        if (counter==3) {
+          input=diff/3;
+          diff=0;
+          counter=0;
         }
       }
-
-      else {
-        myPID.SetMode(pidSwitch); // there are 2 walls close to us
-        digitalWrite(13, HIGH);
-        digitalWrite(DEBUG, LOW);
-      }
+      if (abs(input) >50) myPID.SetMode(MANUAL);
+      else myPID.SetMode(pidSwitch);
 
       myPID.Compute(); 
       setMotorSpeeds(constrain(spL+output,0,255),constrain(spR-output,0,255));
     }   
 
     stopRobot();
-    digitalWrite(13, LOW);
-    digitalWrite(DEBUG, LOW);
 
   }
 
@@ -330,12 +274,7 @@ void go(int direction, int counts) {
       wallClose = checkWall();
     }
 
-    stopRobot();
-    delay(1000);
-    resetEncoders();
-    setMotorSpeeds(spL,spR);
     setMotorDirection(direction);
-
     while(abs(enCountsL)<counts) {
       enCountsL = encoders.getCountsM1();
       enCountsR = encoders.getCountsM2();
@@ -392,18 +331,42 @@ void resetEncoders() {
 void wallFollow() {
 
   while(1) {
-    if (!checkWall())
-      forwardOneSquare();
-    else {
-      getSensors();
-      if (sensorValues[LEFT_FRONT] > 45 && sensorValues[LEFT_BACK] > 45)
-        turnLeft();
-      else if (sensorValues[RIGHT_FRONT] > 45 && sensorValues[RIGHT_BACK] > 45)
-        turnRight();
-      else
-        turnAround();
+    setMotorDirection(FORWARD);
+    setMotorSpeeds(spL,spR);
+    int diff=0;
+    int counter = 0;
+    boolean wallClose=false;
+    while (!wallClose) { 
+      unsigned long currentMillis = millis();
+      if(currentMillis - previousMillis > 20) {
+        previousMillis = currentMillis; 
+        delay(1);
+        diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
+        wallClose=checkWall();
+        counter++;
+        if (counter==3) {
+          input=diff/3;
+          diff=0;
+          counter=0;
+        }
+      }
+
+      if (abs(input) >50) myPID.SetMode(MANUAL);
+      else myPID.SetMode(pidSwitch);
+
+      myPID.Compute(); 
+      setMotorSpeeds(constrain(spL+output,0,255),constrain(spR-output,0,255));
     }
-    delay(1000);
+
+    stopRobot();
+
+    getSensors();
+    if (sensorValues[LEFT_FRONT] > 40 && sensorValues[LEFT_BACK] > 40)
+      turnLeft();
+    else if (sensorValues[RIGHT_FRONT] > 40 && sensorValues[RIGHT_BACK] > 40)
+      turnRight();
+    else
+      turnAround();
   }
 
 }
