@@ -87,73 +87,6 @@ int in[]  = {
 
 //-----------------------------------------------------------
 
-//Structs
-struct coord
-{
-    int x;
-    int y;
-};
-
-struct node
-{
-    int x;
-    int y;
-    bool direction[4]; // N, E, S, W in that order
-    
-    int distance;
-    struct node *previous;
-};
-
-class State
-{
-    int x;
-    int y;
-    int orientation; // N, E, S, W in that order
-    
-    State()
-    {
-        x = 0;
-        y = 0;
-        orientation = 0;
-    }
-    
-    ~State() {}
-    
-    void
-    update(direction)
-    {
-        int increment;
-        switch (direction) {
-            case FORWARD:
-            case BACKWARD:
-                if(direction == FORWARD) increment = 1;
-                else increment = -1;
-                switch (orientation) {
-                    case NORTH:
-                        y += increment;
-                        break;
-                    case EAST:
-                        x += increment;
-                        break;
-                    case SOUTH:
-                        y -= increment;
-                        break;
-                    case WEST:
-                        x -= increment;
-                        break;
-                }
-                break;
-            case LEFT:
-                orientation = orientation - 1 % 4;
-                break;
-            case RIGHT:
-                orientation = orientation + 1 % 4;
-                break;
-        }
-        
-    }
-};
-
 
 // Define pins for Motor Driver TB6612FNG
 #define PWMA 5
@@ -173,11 +106,6 @@ class State
 #define BACKWARD 2
 #define LEFT 3
 #define RIGHT 4
-
-#define NORTH 0
-#define EAST 1
-#define SOUTH 2
-#define WEST 3
 
 
 // CONSTANTS
@@ -435,7 +363,7 @@ void detectWalls() {
 //finds parent of x
 #define Parent(x) (((x)-1)/2)
 
-#define START_SIZE (512)
+#define START_SIZE (300)
 #define INFINITY (255)
 #define MAZE_WIDTH (16)
 #define MAZE_HEIGHT (16)
@@ -476,6 +404,8 @@ void moveBackward()
     state->update(FORWARD);
 }
 
+//for each iteration of the central loop, detectWalls is called, then nextMove
+
 int
 nextMove(struct coord start, struct coord finish)
 {
@@ -483,8 +413,8 @@ nextMove(struct coord start, struct coord finish)
     
     path = maze->shortestPath(start, finish);
     
-    diff.x = path[0]->x - state->x;
-    diff.y = path[0]->y - state->y;
+    diff.x = path[0]->x - state->pos->x;
+    diff.y = path[0]->y - state->pos->y;
     
     if(diff.x && diff.x > 0) {
         switch (state->orientation) {

@@ -9,10 +9,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
-#define START_SIZE (512)
+#define START_SIZE (256)
 #define INFINITY (255)
-#define MAZE_WIDTH (6)
-#define MAZE_HEIGHT (6)
+#define MAZE_WIDTH (16)
+#define MAZE_HEIGHT (16)
 #define PATH_LENGTH (100)
 
 // finds child 0 or child 1 of x (dir = 0 or 1, respectively)
@@ -62,6 +62,7 @@ public:
     {
         this->p[this->n] = node;
         floatUp(this->n++);
+        printf("Size: %d\n", this->n);
         
         if(this->n >= this->size) {
             this->size *= 2;
@@ -275,16 +276,16 @@ int main(int argc, char **argv) {
             N = S = E = W = 0;
             if(i == 0) W = true;
             if(j == 0) S = true;
-            if(i == 5) E = true;
-            if(j == 5) N = true;
+            if(i == 15) E = true;
+            if(j == 15) N = true;
             maze->addNode(i, j, N, E, S, W);
         }
     }
     
     start.x = 0;
     start.y = 0;
-    finish.x = 5;
-    finish.y = 5;
+    finish.x = 15;
+    finish.y = 15;
     
     path = maze->shortestPath(start, finish);
     
