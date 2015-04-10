@@ -160,7 +160,6 @@ void setup() {
   pinMode(BIN2, OUTPUT);
   pinMode(STBY, OUTPUT);
   pinMode(DEBUG, OUTPUT);
-  digitalWrite(DEBUG, HIGH);
   digitalWrite(STBY, HIGH);  // turns motor driver on
 
   // set up the PID
