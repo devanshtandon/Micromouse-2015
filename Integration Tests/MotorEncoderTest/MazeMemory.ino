@@ -150,7 +150,6 @@ unsigned char possibleMoves[4]; // array holding possible moves from given squar
 unsigned char i, j = 0; // i is what cell robot is in (from 0 to 255)
 
 unsigned char state = NORTH;
-byte goal=118;
 
 boolean frontWall;
 boolean rightWall;

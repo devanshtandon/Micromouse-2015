@@ -31,7 +31,7 @@ struct node
 {
     int x;
     int y;
-    bool direction[4]; // N, S, E, W in that order
+    bool direction[4]; // N, E, S, W in that order
     
     int distance;
     struct node *previous;
@@ -164,14 +164,14 @@ public:
     }
     
     void
-    addNode(int x, int y, bool north, bool south, bool east, bool west) {
+    addNode(int x, int y, bool north, bool east, bool south, bool west) {
         this->nodes[x][y] = (struct node *) malloc(sizeof(*(this->nodes[x][y])));
         this->nodes[x][y]->x = x;
         this->nodes[x][y]->y = y;
         
         this->nodes[x][y]->direction[0] = north;
-        this->nodes[x][y]->direction[1] = south;
-        this->nodes[x][y]->direction[2] = east;
+        this->nodes[x][y]->direction[1] = east;
+        this->nodes[x][y]->direction[2] = south;
         this->nodes[x][y]->direction[3] = west;
     }
     
@@ -225,15 +225,15 @@ public:
                             neighbor.x = smallest->x;
                             neighbor.y = smallest->y - 1;
                             break;
-                        // no south wall
-                        case 1:
-                            neighbor.x = smallest->x;
-                            neighbor.y = smallest->y + 1;
-                            break;
                         // no east wall
-                        case 2:
+                        case 1:
                             neighbor.x = smallest->x + 1;
                             neighbor.y = smallest->y;
+                            break;
+                        // no south wall
+                        case 2:
+                            neighbor.x = smallest->x;
+                            neighbor.y = smallest->y + 1;
                             break;
                         // no west wall
                         case 3:
@@ -258,7 +258,7 @@ public:
 
 int main(int argc, char **argv) {
     struct coord start, finish, **path;
-    bool N, S, E, W;
+    bool N, E, S, W;
     Graph *maze = new Graph();
     for(int j = 0; j < MAZE_WIDTH; j++) {
         for (int i = 0; i < MAZE_HEIGHT; i++) {
@@ -267,7 +267,7 @@ int main(int argc, char **argv) {
             if(j == 0) N = true;
             if(i == 15) E = true;
             if(j == 15) S = true;
-            maze->addNode(i, j, N, S, E, W);
+            maze->addNode(i, j, N, E, S, W);
         }
     }
     

@@ -87,13 +87,72 @@ int in[]  = {
 
 //-----------------------------------------------------------
 
+//Structs
+struct coord
+{
+    int x;
+    int y;
+};
 
+struct node
+{
+    int x;
+    int y;
+    bool direction[4]; // N, E, S, W in that order
+    
+    int distance;
+    struct node *previous;
+};
 
-// finds child 0 or child 1 of x (dir = 0 or 1, respectively)
-#define Child(x, dir) (2*(x)+1+(dir))
-
-//finds parent of x
-#define Parent(x) (((x)-1)/2)
+class State
+{
+    int x;
+    int y;
+    int orientation; // N, E, S, W in that order
+    
+    State()
+    {
+        x = 0;
+        y = 0;
+        orientation = 0;
+    }
+    
+    ~State() {}
+    
+    void
+    updateState(direction)
+    {
+        int increment;
+        switch (direction) {
+            case FORWARD:
+            case BACKWARD:
+                if(direction == FORWARD) increment = 1;
+                else increment = -1;
+                switch (orientation) {
+                    case NORTH:
+                        y += increment;
+                        break;
+                    case EAST:
+                        x += increment;
+                        break;
+                    case SOUTH:
+                        y -= increment;
+                        break;
+                    case WEST:
+                        x -= increment;
+                        break;
+                }
+                break;
+            case LEFT:
+                orientation = orientation - 1 % 4;
+                break;
+            case RIGHT:
+                orientation = orientation + 1 % 4;
+                break;
+        }
+        
+    }
+};
 
 
 // Define pins for Motor Driver TB6612FNG
@@ -114,6 +173,11 @@ int in[]  = {
 #define BACKWARD 2
 #define LEFT 3
 #define RIGHT 4
+
+#define NORTH 0
+#define EAST 1
+#define SOUTH 2
+#define WEST 3
 
 
 // CONSTANTS
@@ -164,50 +228,65 @@ double sensorValues[5];
 #define RIGHT_FRONT (3)
 #define RIGHT_BACK (4)
 
+//Pathfinding
+State *state = new State();
+Graph *maze = new Graph();
+
+unsigned char state = NORTH;
+
+boolean frontWall;
+boolean rightWall;
+boolean leftWall;
+
+boolean northWall;
+boolean eastWall;
+boolean westWall;
+boolean southWall;
+
+
 void setup() {
-  // enables Serial communication
-  Serial.begin(9600);
-  PololuWheelEncoders::init(10,9,12,11);
+    // enables Serial communication
+    Serial.begin(9600);
+    PololuWheelEncoders::init(10,9,12,11);
 
-  // set all the Motor Driver pins to OUTPUT
-  pinMode(PWMA, OUTPUT);
-  pinMode(PWMB, OUTPUT);
-  pinMode(AIN1, OUTPUT);
-  pinMode(AIN2, OUTPUT);
-  pinMode(BIN1, OUTPUT);
-  pinMode(BIN2, OUTPUT);
-  pinMode(STBY, OUTPUT);
-  digitalWrite(STBY, HIGH);  // turns motor driver on
+    // set all the Motor Driver pins to OUTPUT
+    pinMode(PWMA, OUTPUT);
+    pinMode(PWMB, OUTPUT);
+    pinMode(AIN1, OUTPUT);
+    pinMode(AIN2, OUTPUT);
+    pinMode(BIN1, OUTPUT);
+    pinMode(BIN2, OUTPUT);
+    pinMode(STBY, OUTPUT);
+    digitalWrite(STBY, HIGH);  // turns motor driver on
 
-  // set up the PID
-  myPID.SetSampleTime(100);
-  myPID.SetOutputLimits(-255, 255);
-  myPID.SetMode(AUTOMATIC);
+    // set up the PID
+    myPID.SetSampleTime(100);
+    myPID.SetOutputLimits(-255, 255);
+    myPID.SetMode(AUTOMATIC);
 
-  analogWrite(PWMA, speed);    // uses PWM to set motor speed
-  analogWrite(PWMB, speed);
+    analogWrite(PWMA, speed);    // uses PWM to set motor speed
+    analogWrite(PWMB, speed);
 
-  Serial.println ("SETUP COMPELETE");
-  delay(5000);
+    Serial.println ("SETUP COMPELETE");
+    delay(5000);
 }
 
 void loop() {
-  
-  go(FORWARD,5*SQUARES);
-  go(BACKWARD,5*SQUARES);
+    go(FORWARD,5*SQUARES);
+    go(BACKWARD,5*SQUARES);
 
-	// initialise maze
-	
-	// algorithm logic
+    // initialise maze
 
-	// get sensors function -- read the sensors and convert to cm
-  // this should update the sensorValues array 
-	getSensors();
+    // algorithm logic
+
+    // get sensors function -- read the sensors and convert to cm
+    // this should update the sensorValues array 
+    getSensors();
 
 
-	// check wall -- use sensor data to populate data for the node
+    // check wall -- use sensor data to populate data for the node
 
-	// get encoders -- encoder counts
+    // get encoders -- encoder counts
 }
 
 
@@ -216,67 +295,60 @@ void loop() {
 //and the number of encoder counts to move.
 void go(int direction, int counts) {
 
-  stopRobot();
-  encoders.getCountsAndResetM1();
-  encoders.getCountsAndResetM2();
-  countsLeft = 0;
-  countsRight = 0;
+    stopRobot();
+    encoders.getCountsAndResetM1();
+    encoders.getCountsAndResetM2();
+    countsLeft = 0;
+    countsRight = 0;
 
-  if (direction == FORWARD) {
-    digitalWrite(AIN1, LOW);   // Left wheel forward
-    digitalWrite(AIN2, HIGH);
-    digitalWrite(BIN1, HIGH);  // Right wheel forward
-    digitalWrite(BIN2, LOW);  
-  }
-
-  else if (direction == BACKWARD) {
-    digitalWrite(AIN1, HIGH); // Left wheel reverse
-    digitalWrite(AIN2, LOW);
-    digitalWrite(BIN1, LOW);  // Right wheel reverse
-    digitalWrite(BIN2, HIGH);
-  }
-
-  else if (direction == LEFT) {
-    digitalWrite(AIN1, HIGH);  // Left wheel reverse
-    digitalWrite(AIN2, LOW);
-    digitalWrite(BIN1, HIGH);  // Right wheel forward
-    digitalWrite(BIN2, LOW);
-  }
-
-  else if (direction == RIGHT) {
-    digitalWrite(AIN1, LOW);  // Left wheel forward
-    digitalWrite(AIN2, HIGH);
-    digitalWrite(BIN1, LOW);  // Right wheel reverse
-    digitalWrite(BIN2, HIGH);
-  }
-
-  if (direction == FORWARD || direction == BACKWARD) {
-
-    while(abs(countsLeft) < counts || abs(countsRight) < counts) {
-      
-      Input = sensorValues[1] - sensorValues[3];
-      myPID.Compute();
-      analogWrite(PWMA, Output);
-
-      countsLeft = encoders.getCountsM1();
-      countsRight = encoders.getCountsM2();
-
-      getSensors();
+    if (direction == FORWARD) {
+        digitalWrite(AIN1, LOW);   // Left wheel forward
+        digitalWrite(AIN2, HIGH);
+        digitalWrite(BIN1, HIGH);  // Right wheel forward
+        digitalWrite(BIN2, LOW);
     }
 
-  }
-
-  else {
-
-    while(abs(countsLeft) < counts || abs(countsRight) < counts) {
-      countsLeft = encoders.getCountsM1();
-      countsRight = encoders.getCountsM2();
+    else if (direction == BACKWARD) {
+        digitalWrite(AIN1, HIGH); // Left wheel reverse
+        digitalWrite(AIN2, LOW);
+        digitalWrite(BIN1, LOW);  // Right wheel reverse
+        digitalWrite(BIN2, HIGH);
     }
 
-  }
+    else if (direction == LEFT) {
+        digitalWrite(AIN1, HIGH);  // Left wheel reverse
+        digitalWrite(AIN2, LOW);
+        digitalWrite(BIN1, HIGH);  // Right wheel forward
+        digitalWrite(BIN2, LOW);
+    }
 
+    else if (direction == RIGHT) {
+        digitalWrite(AIN1, LOW);  // Left wheel forward
+        digitalWrite(AIN2, HIGH);
+        digitalWrite(BIN1, LOW);  // Right wheel reverse
+        digitalWrite(BIN2, HIGH);
+    }
 
-  stopRobot();
+    if (direction == FORWARD || direction == BACKWARD) {
+        while(abs(countsLeft) < counts || abs(countsRight) < counts) {
+          
+            Input = sensorValues[1] - sensorValues[3];
+            myPID.Compute();
+            analogWrite(PWMA, Output);
+
+            countsLeft = encoders.getCountsM1();
+            countsRight = encoders.getCountsM2();
+
+            getSensors();
+        }
+    } else {
+        while(abs(countsLeft) < counts || abs(countsRight) < counts) {
+            countsLeft = encoders.getCountsM1();
+            countsRight = encoders.getCountsM2();
+        }
+    }
+
+    stopRobot();
 }
 
 
@@ -300,33 +372,76 @@ void getSensors() {
 
 }
 
+void detectWalls() {
+    
+    if (sensorValues[FRONT] < WALL_THRESHOLD) {
+        frontWall= true;
+        Serial.println("frontWall= true;");
+    } else {
+        frontWall=false;
+    }
+    
+    if (sensorValues[LEFT_FRONT] < WALL_THRESHOLD) {
+        leftWall= true;
+        Serial.println("leftWall= true;");
+    } else {
+        leftWall=false;
+    }
+    
+    if (sensorValues[RIGHT_FRONT] < WALL_THRESHOLD) {
+        rightWall=true;
+        Serial.println("rightWall= true;");
+    } else {
+        rightWall=false;
+    }
+    
+    switch (state->orientation) {
+        case NORTH:
+            northWall = frontWall;
+            eastWall = rightWall;
+            westWall = leftWall;
+            southWall = false;
+            break;
+        case SOUTH:
+            southWall = frontWall;
+            eastWall = leftWall;
+            westWall = rightWall;
+            frontWall = false;
+            break;
+        case WEST:
+            westWall = frontWall;
+            northWall = rightWall;
+            southWall = leftWall;
+            eastWall = false;
+            break;
+        case EAST:
+            eastWall = frontWall;
+            northWall = leftWall;
+            southWall = rightWall;
+            westWall = false;
+            break;
+    }
+
+    maze->addNode(i, j, northWall, southWall, eastWall, westWall);
+}
+
 /**
  * PATHFINDING
  **/
 
 // CONSTANTS
 
+// finds child 0 or child 1 of x (dir = 0 or 1, respectively)
+#define Child(x, dir) (2*(x)+1+(dir))
+
+//finds parent of x
+#define Parent(x) (((x)-1)/2)
+
 #define START_SIZE (512)
 #define INFINITY (255)
 #define MAZE_WIDTH (16)
 #define MAZE_HEIGHT (16)
 #define PATH_LENGTH (100)
-
-struct coord
-{
-    int x;
-    int y;
-};
-
-struct node
-{
-    int x;
-    int y;
-    bool direction[4]; // N, S, E, W in that order
-    
-    int distance;
-    struct node *previous;
-};
 
 class PriorityQueue
 {
@@ -455,14 +570,14 @@ public:
     }
     
     void
-    addNode(int x, int y, bool north, bool south, bool east, bool west) {
+    addNode(int x, int y, bool north, bool east, bool south, bool west) {
         this->nodes[x][y] = (struct node *) malloc(sizeof(*(this->nodes[x][y])));
         this->nodes[x][y]->x = x;
         this->nodes[x][y]->y = y;
         
         this->nodes[x][y]->direction[0] = north;
-        this->nodes[x][y]->direction[1] = south;
-        this->nodes[x][y]->direction[2] = east;
+        this->nodes[x][y]->direction[1] = east;
+        this->nodes[x][y]->direction[2] = south;
         this->nodes[x][y]->direction[3] = west;
     }
     
@@ -516,15 +631,15 @@ public:
                             neighbor.x = smallest->x;
                             neighbor.y = smallest->y - 1;
                             break;
-                            // no south wall
-                        case 1:
-                            neighbor.x = smallest->x;
-                            neighbor.y = smallest->y + 1;
-                            break;
                             // no east wall
-                        case 2:
+                        case 1:
                             neighbor.x = smallest->x + 1;
                             neighbor.y = smallest->y;
+                            break;
+                            // no south wall
+                        case 2:
+                            neighbor.x = smallest->x;
+                            neighbor.y = smallest->y + 1;
                             break;
                             // no west wall
                         case 3:
