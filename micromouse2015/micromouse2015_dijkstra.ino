@@ -360,8 +360,6 @@ void stopRobot() {
   digitalWrite(BIN2, LOW);  
 }
 
-
-
 void getSensors() {
 
   sensorValues[LEFT_BACK] = FmultiMap(analogRead(A4), in, out, 18);
@@ -442,6 +440,16 @@ void detectWalls() {
 #define MAZE_WIDTH (16)
 #define MAZE_HEIGHT (16)
 #define PATH_LENGTH (100)
+
+int
+getDirections(struct coord start, struct coord finish)
+{
+    struct coord **path;
+    
+    path = maze->shortestPath(start, finish);
+    
+    free(path);
+}
 
 class PriorityQueue
 {

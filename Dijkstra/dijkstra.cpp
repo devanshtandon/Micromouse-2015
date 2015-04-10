@@ -223,7 +223,7 @@ public:
                         // no north wall
                         case 0:
                             neighbor.x = smallest->x;
-                            neighbor.y = smallest->y - 1;
+                            neighbor.y = smallest->y + 1;
                             break;
                         // no east wall
                         case 1:
@@ -233,7 +233,7 @@ public:
                         // no south wall
                         case 2:
                             neighbor.x = smallest->x;
-                            neighbor.y = smallest->y + 1;
+                            neighbor.y = smallest->y - 1;
                             break;
                         // no west wall
                         case 3:
@@ -264,9 +264,9 @@ int main(int argc, char **argv) {
         for (int i = 0; i < MAZE_HEIGHT; i++) {
             N = S = E = W = 0;
             if(i == 0) W = true;
-            if(j == 0) N = true;
+            if(j == 0) S = true;
             if(i == 15) E = true;
-            if(j == 15) S = true;
+            if(j == 15) N = true;
             maze->addNode(i, j, N, E, S, W);
         }
     }
