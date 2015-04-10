@@ -282,6 +282,7 @@ void go(int direction, int counts) {
           myPID.SetMode(pidSwitch);
           leftDistance=0;
           digitalWrite(DEBUG, HIGH);
+          digitalWrite(13, LOW);
         }
         else if ((READ_SENSOR(RIGHT_FRONT) < 37) && (READ_SENSOR(RIGHT_BACK) < 37)) {
           // we are close to the right wall
@@ -293,6 +294,7 @@ void go(int direction, int counts) {
           myPID.SetMode(pidSwitch);
           rightDistance=0;
           digitalWrite(DEBUG, HIGH);
+          digitalWrite(13, LOW);
         }
         else {
           myPID.SetMode(MANUAL);
@@ -302,6 +304,7 @@ void go(int direction, int counts) {
       else {
         myPID.SetMode(pidSwitch); // there are 2 walls close to us
         digitalWrite(13, HIGH);
+        digitalWrite(DEBUG, LOW);
       }
 
       myPID.Compute(); 
@@ -309,6 +312,8 @@ void go(int direction, int counts) {
     }   
 
     stopRobot();
+    digitalWrite(13, LOW);
+    digitalWrite(DEBUG, LOW);
 
   }
 
