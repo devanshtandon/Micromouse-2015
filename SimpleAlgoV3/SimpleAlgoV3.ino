@@ -321,7 +321,6 @@ void centre() {
       setMotorDirection(RIGHT);
       setMotorSpeeds(10,10);
     }
-    delay(500);
   }
   else if (rightWall == true) {
     while (READ_SENSOR(RIGHT_FRONT) - READ_SENSOR(RIGHT_BACK) > 2) {
@@ -332,12 +331,51 @@ void centre() {
       setMotorDirection(LEFT);
       setMotorSpeeds(10,10);
     }
-    delay(500);
   }
   else {
-    // no centre-ing possible
-    // you are fucked.
+    // turn left 
+    // tiny turn
+    // turn right
+    resetEncoders();
+    setMotorDirection(LEFT);
+    setMotorSpeeds(spL,spR);
+    while(abs(enCountsL)<TURN) {
+      enCountsL = encoders.getCountsM1();
+      enCountsR = encoders.getCountsM2();
+    }
+    detectWalls();
+    if (leftWall == true) {
+      while (READ_SENSOR(LEFT_FRONT) - READ_SENSOR(LEFT_BACK) > 2) {
+        setMotorDirection(LEFT);
+        setMotorSpeeds(10,10);
+      }
+      while (READ_SENSOR(LEFT_BACK) - READ_SENSOR(LEFT_FRONT) > 2) {
+        setMotorDirection(RIGHT);
+        setMotorSpeeds(10,10);
+      }
+    }
+    else if (rightWall == true) {
+      while (READ_SENSOR(RIGHT_FRONT) - READ_SENSOR(RIGHT_BACK) > 2) {
+        setMotorDirection(RIGHT);
+        setMotorSpeeds(10,10);
+      }
+      while (READ_SENSOR(RIGHT_BACK) - READ_SENSOR(RIGHT_FRONT) > 2) {
+        setMotorDirection(LEFT);
+        setMotorSpeeds(10,10);
+      }
+    }
+    stopRobot();
+    delay(500);
+    resetEncoders();
+    setMotorDirection(RIGHT);
+    setMotorSpeeds(spL,spR);
+    while(abs(enCountsL)<TURN) {
+      enCountsL = encoders.getCountsM1();
+      enCountsR = encoders.getCountsM2();
+    }
   }
+  stopRobot();
+  delay(500);
 }
 
 // simple algorithm
