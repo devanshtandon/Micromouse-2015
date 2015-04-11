@@ -97,10 +97,10 @@ int in[]  = {
 #define SOUTH 2
 #define WEST 3
 
-#define START_SIZE (256)
+#define QUEUE_SIZE (300)
 #define INFINITY (255)
-#define MAZE_WIDTH (6)
-#define MAZE_HEIGHT (6)
+#define MAZE_WIDTH (16)
+#define MAZE_HEIGHT (16)
 #define PATH_LENGTH (100)
 
 // Define directions
@@ -126,9 +126,7 @@ int in[]  = {
  * PATHFINDING
  **/
 
- 
- 
- #include <MemoryFree.h>
+#include <MemoryFree.h>
 
 //Structs
 struct coord
@@ -196,9 +194,10 @@ class State
                 orientation = orientation + 1 % 4;
                 break;
         }
-        
     }
 };
+
+struct coord *path[PATH_LENGTH];
 
 class PriorityQueue
 {
@@ -456,7 +455,6 @@ double enCountsR;
 State *state = new State();
 Graph *maze = new Graph();
 struct coord finish;
-struct coord *path[PATH_LENGTH];
 
 boolean frontWall;
 boolean rightWall;
@@ -467,7 +465,7 @@ boolean eastWall;
 boolean westWall;
 boolean southWall;
 
-struct coord start, **path;
+struct coord start;
     bool N, E, S, W;
 
 void setup() {
@@ -497,7 +495,7 @@ void setup() {
   finish.y = 5;
   
   Serial.println ("SETUP COMPELETE");
-  delay(2000);
+  delay(500);
 }
 
 
@@ -519,14 +517,13 @@ void loop() {
     finish.x = 15;
     finish.y = 15;
     
-    path = maze->shortestPath(start, finish);
+    maze->shortestPath(start, finish);
     
     for(int i = 0; path[i] != 0; i++) {
         Serial.print("x: ");
         Serial.println(path[i]->x);
         Serial.print("y: ");
         Serial.println(path[i]->y);
-        free(path[i]);
     }
     
     delete maze;
@@ -838,7 +835,7 @@ nextMove(struct coord start, struct coord finish)
 {
     struct coord diff, **path;
     
-    path = maze->shortestPath(start, finish);
+    maze->shortestPath(start, finish);
     
     diff.x = path[0]->x - state->pos->x;
     diff.y = path[0]->y - state->pos->y;
