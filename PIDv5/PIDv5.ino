@@ -242,14 +242,8 @@ void go(int direction, int counts) {
           counter=0;
         }
       }
-      if (abs(frontDiffAvg)>50 || abs(backDiffAvg)>50) {
-        // not 2 wall PID
-        // PID goes off
-        myPID.SetMode(MANUAL);
-        digitalWrite(13, HIGH);
-        digitalWrite(DEBUG,LOW);
-      }
-      else if (leftWall==true && rightWall==true) {
+      
+      if (leftWall==true && rightWall==true) {
         // 2 wall PID
         input = frontDiffAvg;
         myPID.SetMode(pidSwitch);
@@ -274,7 +268,11 @@ void go(int direction, int counts) {
       }
       else {
         // we're fucked
+        // not 2 wall PID
+        // PID goes off
         myPID.SetMode(MANUAL);
+        digitalWrite(13, LOW);
+        digitalWrite(DEBUG,LOW);
       }
 
       myPID.Compute(); 
