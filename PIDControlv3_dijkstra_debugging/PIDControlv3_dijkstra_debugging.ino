@@ -224,7 +224,7 @@ public:
         
         if(this->n >= this->size) {
             this->size *= 2;
-            this->p = (struct node **)realloc(this->p, sizeof(struct node *)*(this->size));
+            this->p = (struct node **) realloc(this->p, sizeof(struct node *)*(this->size));
         }
     }
     
@@ -234,6 +234,8 @@ public:
         struct node *x;
         
         x = this->p[0];
+        Serial.print("Dequeue (n): ");
+        Serial.println(this->n);
         this->p[0] = this->p[(this->n) - 1];
         this->n -= 1;
         floatDown(0);
@@ -308,7 +310,7 @@ public:
         pqueue = new PriorityQueue(START_SIZE);
         // initialize two dimensional graph
         this->nodes = (struct node ***) calloc(MAZE_WIDTH, sizeof(*(this->nodes)));
-        for(int i=0; i<MAZE_WIDTH; i++) {
+        for(int i=0; i<MAZE_WIDTH; i++) { 
             this->nodes[i] = (struct node **) calloc(MAZE_HEIGHT, sizeof(*(this->nodes[i])));
             for(int j=0; j<MAZE_HEIGHT; j++) {
                 this->nodes[i][j] = (struct node *) malloc(sizeof(*(this->nodes[i][j])));
@@ -359,9 +361,9 @@ public:
         while(pqueue->returnSize() > 0) {
             smallest = pqueue->dequeue();
             Serial.print("smallest->x: ");
-            Serial.println(smallest-x);
+            Serial.println(smallest->x);
             Serial.print("smallest->y: ");
-            Serial.println(smallest-y);
+            Serial.println(smallest->y);
             
             if(smallest->x == finish.x && smallest->y == finish.y) {
                 path = (struct coord **) malloc(sizeof(*path)*PATH_LENGTH);
@@ -478,6 +480,9 @@ boolean eastWall;
 boolean westWall;
 boolean southWall;
 
+struct coord start, **path;
+    bool N, E, S, W;
+
 void setup() {
   
   Serial.begin(9600);
@@ -510,8 +515,38 @@ void setup() {
 
 
 void loop() {
-    detectWalls();
-    nextMove(*state->pos, finish);
+    Serial.println("Hello");
+    for(int j = 0; j < MAZE_WIDTH; j++) {
+        for (int i = 0; i < MAZE_HEIGHT; i++) {
+            N = S = E = W = 0;
+            if(i == 0) W = true;
+            if(j == 0) S = true;
+            if(i == 15) E = true;
+            if(j == 15) N = true;
+            maze->addNode(i, j, N, E, S, W);
+        }
+    }
+    
+    start.x = 0;
+    start.y = 0;
+    finish.x = 15;
+    finish.y = 15;
+    
+    path = maze->shortestPath(start, finish);
+    
+    for(int i = 0; path[i] != 0; i++) {
+        Serial.print("x: ");
+        Serial.println(path[i]->x);
+        Serial.print("y: ");
+        Serial.println(path[i]->y);
+        free(path[i]);
+    }
+    
+    delete maze;
+    
+    delay(1000000);
+    //detectWalls();
+    //nextMove(*state->pos, finish);
 }
 
 
