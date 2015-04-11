@@ -217,6 +217,8 @@ void go(int direction, int counts) {
     // input for diffBack
     int input2 = 0;
     output = 0;
+
+    centre();
     
     while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  //1487
       getEncoders();
@@ -308,6 +310,33 @@ void go(int direction, int counts) {
   stopRobot();
 }
 
+void centre() {
+  detectWalls();
+  if (leftWall == true) {
+    while (READ_SENSOR[LEFT_FRONT]-READ_SENSOR[LEFT_BACK] > 5) {
+      setMotorDirection(LEFT);
+      setMotorSpeeds(10,10);
+    }
+    while (READ_SENSOR[LEFT_BACK]-READ_SENSOR[LEFT_FRONT] > 5) {
+      setMotorDirection(RIGHT);
+      setMotorSpeeds(10,10);
+    }
+  }
+  else if (rightWall == true) {
+    while (READ_SENSOR[RIGHT_FRONT]-READ_SENSOR[RIGHT_BACK] > 5) {
+      setMotorDirection(RIGHT);
+      setMotorSpeeds(10,10);
+    }
+    while (READ_SENSOR[RIGHT_BACK]-READ_SENSOR[RIGHT_FRONT] > 5) {
+      setMotorDirection(LEFT);
+      setMotorSpeeds(10,10);
+    }
+  }
+  else {
+    // no centre-ing possible
+    // you are fucked.
+  }
+}
 
 // simple algorithm
 void wallFollow() {
