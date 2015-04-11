@@ -6,13 +6,13 @@ Last Modified: 03-22-2015
 Status: In Progress
 Arduino Code for Micromouse for 
 2015 Brown IEEE Robotics Competition
-Github: https://github.com/devanshtandon/Micromouse-2015
-Upverter: https://upverter.com/chrisdats/26efdb039ba46d67/Micromouse2015/
+Github: https://urldefense.proofpoint.com/v2/url?u=https-3A__github.com_devanshtandon_Micromouse-2D2015&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=9JgUlRVcDU1LnZI1K7K10kEQWIZQsUSl_HR7oUfGNwg&e= 
+Upverter: https://urldefense.proofpoint.com/v2/url?u=https-3A__upverter.com_chrisdats_26efdb039ba46d67_Micromouse2015_&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=Lwi2bWaXUhpoOyBSn-f1X2hNvc-TnL4aclxY-A7cPK8&e= 
 Components:
-- TB6612FNG Dual Motor Driver Carrier - https://www.pololu.com/product/713
-- 75:1 Micro Metal Gearmotor HP with Extended Motor Shaft - https://www.pololu.com/product/2215
-- Sharp GP2Y0A51SK0F Analog Distance Sensor 2-15cm - https://www.pololu.com/product/2450
-- Magnetic Encoders 12 CPR https://www.pololu.com/product/2598
+- TB6612FNG Dual Motor Driver Carrier - https://urldefense.proofpoint.com/v2/url?u=https-3A__www.pololu.com_product_713&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=jeuuFd2xX9PDgS-1VF7hRSbklv429eljQyxoyXuHWWI&e= 
+- 75:1 Micro Metal Gearmotor HP with Extended Motor Shaft - https://urldefense.proofpoint.com/v2/url?u=https-3A__www.pololu.com_product_2215&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=6VGdtzYqEOtr8TtMUZCAEDkKMOuaF7GhKiYh4D-MRRM&e= 
+- Sharp GP2Y0A51SK0F Analog Distance Sensor 2-15cm - https://urldefense.proofpoint.com/v2/url?u=https-3A__www.pololu.com_product_2450&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=30C5odkdmPkMPxYhFAmJK2suDeztJdkqX5hug7kG3dg&e= 
+- Magnetic Encoders 12 CPR https://urldefense.proofpoint.com/v2/url?u=https-3A__www.pololu.com_product_2598&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=gE7qdD7jFtKh2iX5LXW919sqjfybxeSkkJ8YglZGRgA&e= 
 Connections:
 ARD -- OTHER COMPONEENTS
 D2  -- AIN2 Motor Driver
@@ -84,33 +84,25 @@ int in[]  = {
 
 #define DEBUG (A5)
 
-// PATHFINDING CONSTANTS
-
-// finds child 0 or child 1 of x (dir = 0 or 1, respectively)
-#define Child(x, dir) (2*(x)+1+(dir))
-
-//finds parent of x
-#define Parent(x) (((x)-1)/2)
-
-#define NORTH 0
-#define EAST 1
-#define SOUTH 2
-#define WEST 3
-
-#define QUEUE_SIZE (300)
-#define INFINITY (255)
-#define MAZE_WIDTH (16)
-#define MAZE_HEIGHT (16)
-#define PATH_LENGTH (100)
-
 // Define directions
 #define STOP 0
 #define FORWARD 1
 #define BACKWARD 2
 #define LEFT 3
 #define RIGHT 4
-#define DELAY_DEBUG 1000
 
+// Pathfinding:
+#define QUEUE_SIZE (100)
+#define INFINITY (10000)
+#define MAZE_WIDTH (4)
+#define MAZE_HEIGHT (4)
+#define PATH_LENGTH (10)
+
+// finds child 0 or child 1 of x (dir = 0 or 1, respectively)
+#define Child(x, dir) (2*(x)+1+(dir))
+
+//finds parent of x
+#define Parent(x) (((x)-1)/2)
 
 // IR Sensor Setup
 #define LEFT_BACK (4)
@@ -120,25 +112,31 @@ int in[]  = {
 #define RIGHT_BACK (0)
 #define CALIBRATION_ARRAY_SIZE 20
 #define READ_SENSOR(c) (FmultiMap(analogRead(c), in, out, CALIBRATION_ARRAY_SIZE))
-#define WALL_THRESHOLD 70
+double sensorValues[5];
+//boolean walls[4] = {false, false, false, false};
+//#define LEFT_WALL walls[0]
+//#define FRONT_WALL walls[1]
+//#define RIGHT_WALL walls[2]
+//#define BACK_WALL walls[3]
+//// 0 -- Left
+//// 1 -- Front
+//// 2 -- Right
+//// 2 -- Back
 
-/**
- * PATHFINDING
- **/
+// Pathfinding
+struct coord **path2;
 
-#include <MemoryFree.h>
-
-//Structs
 struct coord
 {
     int x;
     int y;
 };
-#define STOP 0
-#define FORWARD 1
-#define BACKWARD 2
-#define LEFT 3
-#define RIGHT 4
+
+/*struct pathstruct
+{
+    struct coord **path;
+};*/
+
 struct node
 {
     int x;
@@ -149,68 +147,13 @@ struct node
     struct node *previous;
 };
 
-class State
-{
-    public:
-    struct coord *pos;
-    int orientation; // N, E, S, W in that order
-    
-    State()
-    {
-        pos = (struct coord *) malloc(sizeof(*pos));
-        pos->x = 0;
-        pos->y = 0;
-        orientation = 0;
-    }
-    
-    ~State() {
-        free(pos);
-    }
-    
-    void
-    update(int direction)
-    {
-        int increment;
-        switch (direction) {
-            case FORWARD:
-            case BACKWARD:
-                if(direction == FORWARD) increment = 1;
-                else increment = -1;
-                switch (orientation) {
-                    case NORTH:
-                        pos->y += increment;
-                        break;
-                    case EAST:
-                        pos->x += increment;
-                        break;
-                    case SOUTH:
-                        pos->y -= increment;
-                        break;
-                    case WEST:
-                        pos->x -= increment;
-                        break;
-                }
-                break;
-            case LEFT:
-                orientation = orientation - 1 % 4;
-                break;
-            case RIGHT:
-                orientation = orientation + 1 % 4;
-                break;
-        }
-    }
-};
-
-struct coord *path[PATH_LENGTH];
-
 class PriorityQueue
 {
-private:
+public:
     int size;
     int n;
     struct node *p[QUEUE_SIZE];
     
-public:
     PriorityQueue()
     {
         size = QUEUE_SIZE;
@@ -232,10 +175,8 @@ public:
     dequeue(void)
     {
         struct node *x;
-        
+        if(this->n <= 0) return 0;
         x = this->p[0];
-        Serial.print("Dequeue (n): ");
-        Serial.println(this->n);
         this->p[0] = this->p[(this->n) - 1];
         this->n -= 1;
         floatDown(0);
@@ -251,6 +192,8 @@ public:
     void
     floatUp(int pos)
     {
+        Serial.println("");
+        Serial.println("floatUp");
         struct node *x, **a;
         a = this->p;
         
@@ -258,6 +201,18 @@ public:
         
         while(1) {
             if(pos > 0 && a[Parent(pos)]->distance > x->distance) {
+                Serial.print("a[pos].x: ");
+                Serial.println(a[pos]->x);
+                Serial.print("a[pos].y: ");
+                Serial.println(a[pos]->y);
+                Serial.print("a[pos].distance: ");
+                Serial.println(a[pos]->distance);
+                Serial.print("a[Parent(pos)].x: ");
+                Serial.println(a[Parent(pos)]->x);
+                Serial.print("a[Parent(pos)].y: ");
+                Serial.println(a[Parent(pos)]->y);
+                Serial.print("a[Parent(pos)].distance: ");
+                Serial.println(a[Parent(pos)]->distance);
                 a[pos] = a[Parent(pos)];
                 pos = Parent(pos);
             } else {
@@ -271,6 +226,8 @@ public:
     void
     floatDown(int pos)
     {
+        Serial.println("");
+        Serial.println("floatDown");
         struct node *x, **a;
         int n = this->n;
         a = this->p;
@@ -280,12 +237,36 @@ public:
         while(1) {
             if(Child(pos, 1) < n && a[Child(pos, 1)]->distance < a[Child(pos, 0)]->distance) {
                 if(a[Child(pos, 1)]->distance < x->distance) {
+                  Serial.print("a[pos].x: ");
+                  Serial.println(a[pos]->x);
+                  Serial.print("a[pos].y: ");
+                  Serial.println(a[pos]->y);
+                  Serial.print("a[pos].distance: ");
+                  Serial.println(a[pos]->distance);
+                  Serial.print("a[Child(pos, 1)].x: ");
+                  Serial.println(a[Child(pos, 1)]->x);
+                  Serial.print("a[Child(pos, 1)].y: ");
+                  Serial.println(a[Child(pos, 1)]->y);
+                  Serial.print("a[Child(pos, 1)].distance: ");
+                  Serial.println(a[Child(pos, 1)]->distance);
                     a[pos] = a[Child(pos, 1)];
                     pos = Child(pos, 1);
                 } else {
                     break;
                 }
             } else if(Child(pos, 0) < n && a[Child(pos, 0)]->distance < x->distance) {
+                Serial.print("a[pos].x: ");
+                Serial.println(a[pos]->x);
+                Serial.print("a[pos].y: ");
+                  Serial.println(a[pos]->y);
+                  Serial.print("a[pos].distance: ");
+                  Serial.println(a[pos]->distance);
+                  Serial.print("a[Child(pos, 0)].x: ");
+                  Serial.println(a[Child(pos, 0)]->x);
+                  Serial.print("a[Child(pos, 0)].y: ");
+                  Serial.println(a[Child(pos, 0)]->y);
+                  Serial.print("a[Child(pos, 0)].distance: ");
+                  Serial.println(a[Child(pos, 0)]->distance);
                 a[pos] = a[Child(pos, 0)];
                 pos = Child(pos, 0);
             } else {
@@ -300,11 +281,10 @@ public:
 
 class Graph
 {
-private:
+public:
     struct node nodes[MAZE_WIDTH][MAZE_HEIGHT];
     PriorityQueue *pqueue;
     
-public:
     Graph()
     {
         pqueue = new PriorityQueue();
@@ -326,10 +306,11 @@ public:
         this->nodes[x][y].direction[3] = west;
     }
     
-    void
+    struct coord **
     shortestPath(struct coord start, struct coord finish) {
         int i, alt;
         struct coord neighbor, swap;
+        static struct coord *path[PATH_LENGTH];
         struct node* smallest;
         
         for(int j = 0; j < MAZE_WIDTH; j++) {
@@ -345,26 +326,59 @@ public:
                 }
             }
         }
-        
+        Serial.println("NEW");
         while(pqueue->returnSize() > 0) {
+            Serial.print("p.x: ");
+            Serial.println(pqueue->p[0]->x);
+            Serial.print("p.y: ");
+            Serial.println(pqueue->p[0]->y);
+            Serial.print("p.distance: ");
+            Serial.println(pqueue->p[0]->distance);
             smallest = pqueue->dequeue();
-            Serial.print("smallest->x: ");
+            Serial.print("Smallest.x: ");
             Serial.println(smallest->x);
-            Serial.print("smallest->y: ");
+            Serial.print("Smallest.y: ");
             Serial.println(smallest->y);
-            Serial.print("freeMemory()=");
-            Serial.println(freeMemory());
+            Serial.print("Smallest.distance: ");
+            Serial.println(smallest->distance);
             
             if(smallest->x == finish.x && smallest->y == finish.y) {
+              Serial.println("PATH RETURN");
+                  Serial.println("PATH RETURN");
+                  Serial.println("PATH RETURN");
+                  Serial.println("PATH RETURN");
+                  Serial.println("PATH RETURN");
+                  Serial.println("PATH RETURN");
+                  Serial.println("PATH RETURN");
+                  Serial.println("PATH RETURN");
+                  Serial.println("PATH RETURN");
+                  Serial.println("PATH RETURN");
                 for(i = 0; smallest->previous != 0; i++) {
-                    struct coord pathpt;
-                    pathpt.x = smallest->x;
-                    pathpt.y = smallest->y;
-                    path[i] = &pathpt;
+                  static struct coord small;
+                  Serial.print("Smallest.x: ");
+                  Serial.println(smallest->x);
+            Serial.print("Smallest.y: ");
+            Serial.println(smallest->y);
+            Serial.print("Smallest.distance: ");
+            Serial.println(smallest->distance);
+                    small.x = smallest->x;
+                    small.y = smallest->y;
+                    path[i] = &small;
+                    Serial.print("path[i].x: ");
+                  Serial.println(path[i]->x);
+            Serial.print("path[i].y: ");
+            Serial.println(path[i]->y);
+            
+            Serial.print("small.x: ");
+                  Serial.println(small.x);
+            Serial.print("small.y: ");
+            Serial.println(small.y);
                     smallest = smallest->previous;
                 }
                 
                 // reverse path array
+                Serial.print("iiiiiii: ");
+            Serial.println(i);
                 for(int j=0; j<((i-1)/2); j++) {
                     swap = *path[j];
                     *path[j] = *path[i-j-1];
@@ -411,27 +425,21 @@ public:
                     if(alt < this->nodes[neighbor.x][neighbor.y].distance) {
                         this->nodes[neighbor.x][neighbor.y].distance = alt;
                         this->nodes[neighbor.x][neighbor.y].previous = smallest;
+                        Serial.print("neighbor.x: ");
+                        Serial.println(nodes[neighbor.x][neighbor.y].x);
+                        Serial.print("neighbor.y: ");
+                        Serial.println(nodes[neighbor.x][neighbor.y].y);
+                        Serial.print("neighbor.distance: ");
+                        Serial.println(nodes[neighbor.x][neighbor.y].distance);
                         pqueue->enqueue(&this->nodes[neighbor.x][neighbor.y]);
                     }
                 }
             }
         }
         
-        return;
+        return path;
     }
 };
-
-double sensorValues[5];
-//boolean walls[4] = {false, false, false, false};
-//#define LEFT_WALL walls[0]
-//#define FRONT_WALL walls[1]
-//#define RIGHT_WALL walls[2]
-//#define BACK_WALL walls[3]
-//// 0 -- Left
-//// 1 -- Front
-//// 2 -- Right
-//// 2 -- Back
-
 
 // MOTOR CONTROL CONSTANTS: NEEDS FINE-TUNING
 const int COUNTS_PER_CM=93; 
@@ -453,12 +461,10 @@ boolean pidSwitch=AUTOMATIC;
 PololuWheelEncoders encoders;
 double enCountsL; // encoder counts
 double enCountsR;
-#define WALL_THRESHOLD (60)
 
-//Pathfinding Setup
-State *state = new State();
-Graph *maze = new Graph();
-struct coord finish;
+
+#define WALL_THRESHOLD (70)
+#define DELAY_DEBUG 1000
 
 boolean frontWall;
 boolean rightWall;
@@ -469,8 +475,12 @@ boolean eastWall;
 boolean westWall;
 boolean southWall;
 
-struct coord start;
-    bool N, E, S, W;
+// Pathfinding:
+Graph *maze = new Graph();\
+struct coord finish, start;
+int No, So, Ea, We;
+
+struct node *new2;
 
 void setup() {
   
@@ -495,46 +505,50 @@ void setup() {
   myPID.SetOutputLimits(-255, 255);
   myPID.SetMode(pidSwitch);
   
-  finish.x = 5;
-  finish.y = 5;
+  finish.x = 4;
+  finish.y = 4;
+  start.x = 0;
+  start.y = 0;
   
-  Serial.println ("SETUP COMPELETE");
-  delay(500);
+  Serial.println ("SETUP COMPLETE");
+  delay(2000);
 }
 
 
 void loop() {
-    Serial.println("Hello");
     for(int j = 0; j < MAZE_WIDTH; j++) {
         for (int i = 0; i < MAZE_HEIGHT; i++) {
-            N = S = E = W = 0;
-            if(i == 0) W = true;
-            if(j == 0) S = true;
-            if(i == 15) E = true;
-            if(j == 15) N = true;
-            maze->addNode(i, j, N, E, S, W);
+            No = So = Ea = We = 0;
+            if(i == 0) We = true;
+            if(j == 0) So = true;
+            if(i == 3) Ea = true;
+            if(j == 3) No = true;
+            maze->addNode(i, j, No, Ea, So, We);
         }
     }
     
     start.x = 0;
     start.y = 0;
-    finish.x = 15;
-    finish.y = 15;
+    finish.x = 3;
+    finish.y = 2;
     
-    maze->shortestPath(start, finish);
+    path2 = maze->shortestPath(start, finish);
     
-    for(int i = 0; path[i] != 0; i++) {
+    int i;
+    
+    for(i = 0; path2[i] != 0; i++) {
         Serial.print("x: ");
-        Serial.println(path[i]->x);
+        Serial.println((*path2[i]).x);
         Serial.print("y: ");
-        Serial.println(path[i]->y);
+        Serial.println((*path2[i]).y);
     }
     
-    delete maze;
-    
-    delay(1000000);
-    //detectWalls();
-    //nextMove(*state->pos, finish);
+    Serial.println("NEW LOOP()");
+    Serial.println("NEW LOOP()");
+    Serial.println("NEW LOOP()");
+    Serial.print("x: ");
+        Serial.println(path2[i]->x);
+    Serial.println(i);
 }
 
 
@@ -555,44 +569,88 @@ void go(int direction, int counts) {
 
   if (direction == FORWARD) {
 
-    int diff=0;
-    int diffBack=0;
+    // difference between forward left and right sensors
+    int frontDiff=0;
+    // difference between back left and right sensors
+    int backDiff=0;
+    int frontDiffAvg = 0;
+    int backDiffAvg = 0;
+
     int counter = 0;
+    int distToLeft = 0;
+    int distToRight = 0;
+    int distToLeftAvg = 0;
+    int distToRightAvg = 0;
+    // input for diffBack
     int input2 = 0;
     output = 0;
+    
     while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  //1487
       getEncoders();
+      detectWalls();
       unsigned long currentMillis = millis();
       if(currentMillis - previousMillis > 20) {
+        // setup for PID
         previousMillis = currentMillis; // save the last time you blinked the LED
         delay(1);
-        diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
-        diffBack += READ_SENSOR(LEFT_BACK)-READ_SENSOR(RIGHT_BACK);
+        distToLeft += READ_SENSOR(LEFT_FRONT);
+        distToRight += READ_SENSOR(RIGHT_FRONT);
+        frontDiff += distToLeft - distToRight;
+        backDiff += READ_SENSOR(LEFT_BACK)-READ_SENSOR(RIGHT_BACK);
         wallClose=checkWall();
         counter=counter+1;
         if (counter==3) {
-          input=diff/3;
-          input2=diffBack/3;
-          diff=0;
-          diffBack=0;
+          frontDiffAvg=frontDiff/3;
+          backDiffAvg=backDiff/3;
+          distToLeftAvg=distToLeft/3;
+          distToRightAvg=distToRight/3;
+          frontDiff=0;
+          backDiff=0;
+          distToLeft=0;
+          distToRight=0;
           counter=0;
         }
       }
-      if (abs(input)>40 || abs(input2)>40) {
-        myPID.SetMode(MANUAL);
+
+      if (leftWall==true && rightWall==true) {
+        // 2 wall PID
+        input = frontDiffAvg;
+        myPID.SetMode(pidSwitch);
+        digitalWrite(13, HIGH);
         digitalWrite(DEBUG,LOW);
       }
-      else {
+      else if (leftWall==true && rightWall==false) {
+        // 1 wall PID 
+        // close to left wall
+        input = (distToLeftAvg - 32);
         myPID.SetMode(pidSwitch);
+        digitalWrite(13, LOW);
         digitalWrite(DEBUG,HIGH);
       }
+      else if (leftWall==false && rightWall==true) {
+        // 1 wall PID
+        // close to right wall
+        input = - (distToRightAvg - 32);
+        myPID.SetMode(pidSwitch);
+        digitalWrite(13, LOW);
+        digitalWrite(DEBUG,HIGH);
+      }
+      else {
+        // we're fucked
+        // not 2 wall PID
+        // PID goes off
+        myPID.SetMode(MANUAL);
+        digitalWrite(13, LOW);
+        digitalWrite(DEBUG,LOW);
+      }
+
       myPID.Compute(); 
       setMotorSpeeds(constrain(spL+output,0,255),constrain(spR-output,0,255));
     }   
 
     stopRobot();
     digitalWrite(DEBUG,LOW);
-
+    digitalWrite(13, LOW);
   }
 
   else {
@@ -618,6 +676,7 @@ void go(int direction, int counts) {
 }
 
 
+// simple algorithm
 void wallFollow() {
 
   while(1) {
@@ -632,10 +691,22 @@ void wallFollow() {
       else
         turnAround();
     }
-    delay(DELAY_DEBUG);
+    delay(1000);
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 void setMotorDirection(int direction) {
   if (direction == FORWARD) {
@@ -700,7 +771,7 @@ void turnLeft() {
 
 void turnAround() {
   go(LEFT, 1*TURN);
-  delay(DELAY_DEBUG);
+  delay(1000);
   go(LEFT, 1*TURN);
 }
 
@@ -717,6 +788,7 @@ void resetEncoders() {
 }
 
 
+// update the sensorValues array
 void getSensors() {
 
   sensorValues[LEFT_BACK] = READ_SENSOR(LEFT_BACK);
@@ -727,7 +799,8 @@ void getSensors() {
 
 }
 
-
+// checks if the front wall is too close
+// stop from running into front wall
 boolean checkWall() {
   if(READ_SENSOR(FRONT) < 37)
     return true;
@@ -736,212 +809,27 @@ boolean checkWall() {
 }
 
 
+// checks the walls, sets the boolean array
 void detectWalls() {
     getSensors();
-    printSensors();
     
     if (sensorValues[FRONT] < WALL_THRESHOLD) {
         frontWall= true;
-        Serial.println("frontWall= true;");
     } else {
         frontWall=false;
     }
     
     if (sensorValues[LEFT_FRONT] < WALL_THRESHOLD && sensorValues[LEFT_BACK] < WALL_THRESHOLD) {
         leftWall= true;
-        Serial.println("leftWall= true;");
     } else {
         leftWall=false;
     }
     
     if (sensorValues[RIGHT_FRONT] < WALL_THRESHOLD && sensorValues[RIGHT_BACK] < WALL_THRESHOLD) {
         rightWall=true;
-        Serial.println("rightWall= true;");
     } else {
         rightWall=false;
     }
     
-    switch (state->orientation) {
-        case NORTH:
-            northWall = frontWall;
-            eastWall = rightWall;
-            westWall = leftWall;
-            southWall = false;
-            break;
-        case SOUTH:
-            southWall = frontWall;
-            eastWall = leftWall;
-            westWall = rightWall;
-            northWall = false;
-            break;
-        case WEST:
-            westWall = frontWall;
-            northWall = rightWall;
-            southWall = leftWall;
-            eastWall = false;
-            break;
-        case EAST:
-            eastWall = frontWall;
-            northWall = leftWall;
-            southWall = rightWall;
-            westWall = false;
-            break;
-    }
-    
-    maze->addNode(state->pos->x, state->pos->y, northWall, southWall, eastWall, westWall);
-}
 
-void
-moveLeft()
-{
-    turnLeft();
-    state->update(LEFT);
-    forwardOneSquare();
-    state->update(FORWARD);
-}
-
-void moveRight()
-{
-    turnRight();
-    state->update(RIGHT);
-    forwardOneSquare();
-    state->update(FORWARD);
-}
-
-void moveForward()
-{
-    forwardOneSquare();
-    state->update(FORWARD);
-}
-
-void moveBackward()
-{
-    turnAround();
-    forwardOneSquare();
-    state->update(RIGHT);
-    state->update(RIGHT);
-    state->update(FORWARD);
-}
-
-//for each iteration of the central loop, detectWalls is called, then nextMove
-
-void
-nextMove(struct coord start, struct coord finish)
-{
-    struct coord diff, **path;
-    
-    maze->shortestPath(start, finish);
-    
-    diff.x = path[0]->x - state->pos->x;
-    diff.y = path[0]->y - state->pos->y;
-    
-    Serial.print("diff.x: ");
-    Serial.println(diff.x);
-    Serial.print("diff.y: ");
-    Serial.println(diff.y);
-    Serial.print("path.x: ");
-    Serial.println(path[0]->x);
-    Serial.print("path.y: ");
-    Serial.println(path[0]->y);
-    Serial.print("statepos.x: ");
-    Serial.println(state->pos->x);
-    Serial.print("statepos.y: ");
-    Serial.println(state->pos->y);
-    digitalWrite(13,HIGH);
-    delay(500);
-    digitalWrite(13,LOW);
-    delay(500);
-    
-    if(diff.x > 0) {
-        Serial.println("Move east");
-        switch (state->orientation) {
-            case NORTH:
-                moveRight();
-                break;
-            case EAST:
-                moveForward();
-                break;
-            case SOUTH:
-                moveLeft();
-                break;
-            case WEST:
-                moveBackward();
-                break;
-            default:
-                break;
-        }
-    } else if(diff.x < 0) {
-        Serial.println("Move west");
-        switch (state->orientation) {
-            case NORTH:
-                moveLeft();
-                break;
-            case EAST:
-                moveBackward();
-                break;
-            case SOUTH:
-                moveRight();
-                break;
-            case WEST:
-                moveForward();
-                break;
-            default:
-                break;
-        }
-    } else if(diff.y > 0) {
-        Serial.println("Move north");
-        switch (state->orientation) {
-            case NORTH:
-                moveForward();
-                break;
-            case EAST:
-                moveLeft();
-                break;
-            case SOUTH:
-                moveBackward();
-                break;
-            case WEST:
-                moveRight();
-                break;
-            default:
-                break;
-        }
-    } else if(diff.y < 0) {
-        Serial.println("Move south");
-        switch (state->orientation) {
-            case NORTH:
-                moveBackward();
-                break;
-            case EAST:
-                moveRight();
-                break;
-            case SOUTH:
-                moveForward();
-                break;
-            case WEST:
-                moveLeft();
-                break;
-            default:
-                break;
-        }
-    }
-    
-    free(path);
-    
-    return;
-}
-
-void printSensors() {
-
-  Serial.print("Left back sensor value: ");
-  Serial.println(sensorValues[LEFT_BACK]);
-  Serial.print("Left forward sensor value: ");
-  Serial.println(sensorValues[LEFT_FRONT]);
-  Serial.print("Front sensor value: ");
-  Serial.println(sensorValues[FRONT]);
-  Serial.print("Right forward sensor value: ");
-  Serial.println(sensorValues[RIGHT_FRONT]);
-  Serial.print("Right back sensor value: ");
-  Serial.println(sensorValues[RIGHT_BACK]);
-  Serial.println(" ");
 }
