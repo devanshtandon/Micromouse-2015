@@ -158,7 +158,7 @@ struct coord {
 #define UNSEEN (5)
 
 //should be GLOBAL maze
-char maze[18][18];
+char maze[16][16];
 int randomNumber = random(2);
 //should be global location
 struct coord location;
@@ -198,15 +198,12 @@ goForward = 0;
 
   randomSeed(20);
   
-  for (int i = 0; i<18; i++) {
-	for (int j = 0; j<18; j++) {
-	maze[i][j] = UNSEEN;
-	}
+  for (int i = 0; i<16; i++) {
+  for (int j = 0; j<16; j++) {
+  maze[i][j] = UNSEEN;
+  }
 }
-for (i = 0; i<18; i++) {
-	maze[0][i] = maze[17][i] = SEEN;
-	maze[i][0] = maze[i][17] = SEEN;
-}
+
 
   Serial.println ("SETUP COMPELETE");
   delay(2000);
@@ -216,7 +213,6 @@ for (i = 0; i<18; i++) {
 void loop() {
   
   wallFollow();
-
 
 }
 
@@ -237,13 +233,13 @@ void updateForward() {
     location.x++;
   }
   if (location.x<0) {
-  	location.x = 0;
+    location.x = 0;
   } else if (location.y <0) {
-  	location.y = 0;
-  } else if (location.y > 17) {
-  	location.y = 17;
-  } else if (location.x > 17) {
-  	location.x = 17;
+    location.y = 0;
+  } else if (location.y > 15) {
+    location.y = 15;
+  } else if (location.x > 15) {
+    location.x = 15;
   }
   maze[location.x][location.y] = SEEN;
 }
@@ -420,35 +416,6 @@ void go(int direction, int counts) {
   stopRobot();
 }
 
-void centre() {
-  detectWalls();
-  if (leftWall == true) {
-    while (READ_SENSOR(LEFT_FRONT) - READ_SENSOR(LEFT_BACK) > 2) {
-      setMotorDirection(LEFT);
-      setMotorSpeeds(10,10);
-    }
-    while (READ_SENSOR(LEFT_BACK) - READ_SENSOR(LEFT_FRONT) > 2) {
-      setMotorDirection(RIGHT);
-      setMotorSpeeds(10,10);
-    }
-  }
-  else if (rightWall == true) {
-    while (READ_SENSOR(RIGHT_FRONT) - READ_SENSOR(RIGHT_BACK) > 2) {
-      setMotorDirection(RIGHT);
-      setMotorSpeeds(10,10);
-    }
-    while (READ_SENSOR(RIGHT_BACK) - READ_SENSOR(RIGHT_FRONT) > 2) {
-      setMotorDirection(LEFT);
-      setMotorSpeeds(10,10);
-    }
-  }
-  else {
-    // no centre-ing possible
-    // you are fucked.
-  }
-  stopRobot();
-  delay(500);
-}
 
 // simple algorithm
 void wallFollow() {
@@ -472,9 +439,9 @@ void wallFollow() {
       
     }
     else if (goForward == 1) {
-    	forwardOneSquare();
-    	goForward = 0;
-    	} else if (frontWall) { 
+      forwardOneSquare();
+      goForward = 0;
+      } else if (frontWall) { 
       adjustToFrontWall = true;
       if (dir == FORWARD) {
         if (maze[location.x+1][location.y] == UNSEEN && maze[location.x-1][location.y] == SEEN) {
@@ -759,6 +726,36 @@ boolean checkWall() {
     return false;
 }
 
+void centre() {
+  detectWalls();
+  if (leftWall == true) {
+    while (READ_SENSOR(LEFT_FRONT) - READ_SENSOR(LEFT_BACK) > 2) {
+      setMotorDirection(LEFT);
+      setMotorSpeeds(10,10);
+    }
+    while (READ_SENSOR(LEFT_BACK) - READ_SENSOR(LEFT_FRONT) > 2) {
+      setMotorDirection(RIGHT);
+      setMotorSpeeds(10,10);
+    }
+  }
+  else if (rightWall == true) {
+    while (READ_SENSOR(RIGHT_FRONT) - READ_SENSOR(RIGHT_BACK) > 2) {
+      setMotorDirection(RIGHT);
+      setMotorSpeeds(10,10);
+    }
+    while (READ_SENSOR(RIGHT_BACK) - READ_SENSOR(RIGHT_FRONT) > 2) {
+      setMotorDirection(LEFT);
+      setMotorSpeeds(10,10);
+    }
+  }
+  else {
+    // no centre-ing possible
+    // you are fucked.
+  }
+  stopRobot();
+  delay(500);
+}
+
 
 // checks the walls, sets the boolean array
 void detectWalls() {
@@ -781,6 +778,4 @@ void detectWalls() {
     } else {
         rightWall=false;
     }
-    
-
 }
