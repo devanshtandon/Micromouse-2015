@@ -190,6 +190,7 @@ void loop() {
 //and the number of encoder counts to move.
 void go(int direction, int counts) {
 
+  centre();
   resetEncoders();
   setMotorSpeeds(spL,spR);
   setMotorDirection(direction);
@@ -217,8 +218,6 @@ void go(int direction, int counts) {
     // input for diffBack
     int input2 = 0;
     output = 0;
-
-    centre();
     
     while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  //1487
       getEncoders();
