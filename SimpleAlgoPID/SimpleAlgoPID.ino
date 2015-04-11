@@ -186,7 +186,92 @@ void loop() {
 
 
 }
+struct coord {
+  int x;
+  int y;
+}
 
+#define SEEN (4)
+#define UNSEEN (5)
+
+//should be GLOBAL maze
+char maze[16][16];
+for (int i = 0; i<16; i++) {
+	for int j = 0; j<16; j++) {
+	maze[i][j] = UNSEEN;
+	}
+}
+//should be global location
+struct coord location;
+location.x = 0;
+location.y = 0;
+
+maze[0][0] = LOCATION;
+int dir = FORWARD;
+
+//updating when moving forward
+
+void updateForward() {
+  if (dir == FORWARD) {
+    location.y++;
+  }
+  if (dir == BACKWARD) {
+    location.y--;
+  }
+  if (dir == LEFT) {
+    location.x--;
+  }
+  if (dir == RIGHT) {
+    location.x++;
+  }
+  maze[location.x][location.y] = SEEN;
+}
+
+//updating when turning right
+void updateRight() {
+   if (dir == FORWARD) {
+    dir = RIGHT;
+  } else 
+  if (dir == BACKWARD) {
+    dir = LEFT;
+  } else
+  if (dir == LEFT) {
+    dir = FORWARD;
+  }
+  else if (dir == RIGHT) {
+    dir = BACKWARD;
+  }
+}
+//updatewhen turning  left
+void updateLeft() {
+   if (dir == FORWARD) {
+    dir = LEFT;
+  }
+  else if (dir == BACKWARD) {
+    dir = RIGHT;
+  } else
+  if (dir == LEFT) {
+    dir = BACKWARD;
+  } else
+  if (dir == RIGHT) {
+    dir = FORWARD;
+  }
+}
+//updating turing around
+void updateTurnAround() {
+   if (dir == FORWARD) {
+    dir = BACKWARD;
+  } else
+  if (dir == BACKWARD) {
+    dir = FORWARD;
+  } else
+  if (dir == LEFT) {
+    dir = RIGHT;
+  } else
+  if (dir == RIGHT) {
+    dir = LEFT;
+  }
+}
 
 
 //Give a direction (FORWARD, BACKWARD, LEFT, or RIGHT)
@@ -318,7 +403,6 @@ void wallFollow() {
 
   while(1) {
     detectWalls();
-    int randNumber2 = random(1);
     if (leftWall && rightWall && frontWall) {
       adjustToFrontWall = true;
       turnAround();
@@ -333,52 +417,188 @@ void wallFollow() {
     else if (rightWall && frontWall) {
       adjustToFrontWall = true;
       turnLeft();
+      
     }
     else if (frontWall) { 
+      int randomNumber = random(1);
       adjustToFrontWall = true;
-      if (randNumber2 == 0)
-        turnLeft();
-      else
-        turnRight();
+      if (dir == FORWARD) {
+        if (maze[location.x+1][location.y] == UNSEEN && maze[location.x-1][location.y] == SEEN) {
+          turnRight();
+        } else if (maze[location.x+1][location.y] == SEEN && maze[location.x-1][location.y] == UNSEEN) {
+          turnLeft();
+        } else if (randomNumber) {
+          turnLeft();
+        } else {
+          turnRight;
+        }
+      } else if (dir == BACKWARD) {
+        if (maze[location.x+1][location.y] == UNSEEN && maze[location.x-1][location.y] == SEEN) {
+          turnLeft();
+        } else if (maze[location.x+1][location.y] == SEEN && maze[location.x-1][location.y] == UNSEEN) {
+          turnRight();
+        } else if (randomNumber) {
+          turnRight();
+        } else {
+          turnLeft;
+        }
+      } else if (dir == LEFT) {
+        if (maze[location.x][location.y+1] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
+          turnRight();
+        } else if (maze[location.x][location.y+1] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
+          turnLeft();
+        } else if (randomNumber) {
+          turnLeft();
+        } else {
+          turnRight;
+        }
+      } else {
+        if (maze[location.x+1][location.y] == UNSEEN && maze[location.x-1][location.y] == SEEN) {
+          turnLeft();
+        } else if (maze[location.x+1][location.y] == SEEN && maze[location.x-1][location.y] == UNSEEN) {
+          turnRight();
+        } else if (randomNumber) {
+          turnRight();
+        } else {
+          turnLeft;
+        }
+      }
     }
     else if (rightWall) {
-      if (randNumber2 == 0)
-        forwardOneSquare();
-      else
-        turnLeft();
+      if (dir == FORWARD) {
+        if (maze[location.x-1][location.y] == UNSEEN && maze[location.x][location.y+1] == SEEN) {
+          turnLeft();
+        } else if (maze[location.x-1][location.y] == SEEN && maze[location.x][location.y+1] == UNSEEN) {
+          forwardOneSquare();
+        } else if (randomNumber) {
+          forwardOneSquare();
+        } else {
+          turnLeft();
+        }
+      } else if (dir == BACKWARD) {
+        if (maze[location.x+1][location.y] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
+          turnLeft();
+        } else if (maze[location.x+1][location.y] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
+          forwardOneSquare();
+        } else if (randomNumber) {
+          forwardOneSquare();
+        } else {
+          turnLeft();
+        } 
+        }else if (dir == RIGHT) {
+          if (maze[location.x+1][location.y] == SEEN && maze[location.x][location.y+1] == UNSEEN) {
+          turnLeft();
+        } else if (maze[location.x+1][location.y] == UNSEEN && maze[location.x][location.y+1] == SEEN) {
+          forwardOneSquare();
+        } else if (randomNumber) {
+          forwardOneSquare();
+        } else {
+          turnLeft();
+        } 
+     }else {
+          if (maze[location.x-1][location.y] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
+          turnLeft();
+        } else if (maze[location.x-1][location.y] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
+          forwardOneSquare();
+        } else if (randomNumber) {
+          forwardOneSquare();
+        } else {
+          turnLeft();
+        }
+      }
     }
     else if (leftWall) {
-       if (randNumber2 == 0)
-        forwardOneSquare();
-      else
-        turnRight();     
+       if (dir == FORWARD) {
+        if (maze[location.x+1][location.y] == UNSEEN && maze[location.x][location.y+1] == SEEN) {
+          turnRight();
+        } else if (maze[location.x+1][location.y] == SEEN && maze[location.x][location.y+1] == UNSEEN) {
+          forwardOneSquare();
+        } else if (randomNumber) {
+          forwardOneSquare();
+        } else {
+          turnRight();
+        }
+      } else if (dir == BACKWARD) {
+        if (maze[location.x-1][location.y] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
+          turnRight();
+        } else if (maze[location.x-1][location.y] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
+          forwardOneSquare();
+        } else if (randomNumber) {
+          forwardOneSquare();
+        } else {
+          turnRight();
+        } 
+        }else if (dir == RIGHT) {
+          if (maze[location.x+1][location.y] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
+          turnRight();
+        } else if (maze[location.x+1][location.y] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
+          forwardOneSquare();
+        } else if (randomNumber) {
+          forwardOneSquare();
+        } else {
+          turnRight();
+        } 
+     }else {
+          if (maze[location.x-1][location.y] == SEEN && maze[location.x][location.y+1] == UNSEEN) {
+          turnRight();
+        } else if (maze[location.x-1][location.y] == UNSEEN && maze[location.x][location.y+1] == SEEN) {
+          forwardOneSquare();
+        } else if (randomNumber) {
+          forwardOneSquare();
+        } else {
+          turnLeft();
+        }
+      }    
     }
     else {
       int randNumber3 = random(2);
-      if (randNumber3 == 0)
-        forwardOneSquare();
-      else if (randNumber3 == 1)
-        turnLeft();
-      else
-        turnRight();
+      if (dir == FORWARD) {
+        if (maze[location.x-1][location.y] == UNSEEN) {
+          turnLeft();
+        } else if (maze[location.x+1][location.y] == UNSEEN ) {
+          turnRight();
+        } else if (maze[location.x][location.y+1] == UNSEEN ) {
+          forwardOneSquare();
+        } else {
+          turnLeft();
+        }
+      } else if (dir == BACKWARD) {
+         if (maze[location.x+1][location.y] == UNSEEN) {
+          turnLeft();
+        } else if (maze[location.x-1][location.y] == UNSEEN ) {
+          turnRight();
+        } else if (maze[location.x][location.y-1] == UNSEEN ) {
+          forwardOneSquare();
+        } else {
+          turnLeft();
+        }
+      } else if (dir == RIGHT) {
+          if (maze[location.x][location.y+1] == UNSEEN) {
+          turnLeft();
+        } else if (maze[location.x][location.y-1] == UNSEEN ) {
+          turnRight();
+        } else if (maze[location.x+1][location.y] == UNSEEN ) {
+          forwardOneSquare();
+        } else {
+          turnLeft();
+        }
+        
+      } else {
+           if (maze[location.x][location.y-1] == UNSEEN) {
+          turnLeft();
+        } else if (maze[location.x][location.y+1] == UNSEEN ) {
+          turnRight();
+        } else if (maze[location.x-1][location.y] == UNSEEN ) {
+          forwardOneSquare();
+        } else {
+          turnLeft();
+        }
+      }
     }
-
-
     delay(1000);
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
 
 
 void setMotorDirection(int direction) {
@@ -428,6 +648,7 @@ void stopRobot() {
 
 void forwardOneSquare() {
   go(FORWARD, 1*SQUARE);
+  updateForward();
 }
 
 void backwardOneSquare() {
@@ -436,16 +657,19 @@ void backwardOneSquare() {
 
 void turnRight() {
   go(RIGHT, 1*TURN);
+  updateRight();
 }
 
 void turnLeft() {
   go(LEFT, 1*TURN);
+  updateLeft();
 }
 
 void turnAround() {
   go(LEFT, 1*TURN);
   delay(1000);
   go(LEFT, 1*TURN);
+  updateTurnAround();
 }
 
 void getEncoders(){
