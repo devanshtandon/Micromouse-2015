@@ -312,29 +312,49 @@ void go(int direction, int counts) {
 // simple algorithm
 void wallFollow() {
 
+  boolean turned = false;
+
   while(1) {
 
     detectWalls();
     int randomNumber = random(2);
 
+    if (turned) {
+      forwardOneSquare();
+      turned = false;
+      delay(500);
+    }
+
     if (randomNumber == 0) {
-      if (leftWall==false)
+      if (leftWall==false) {
         turnLeft();
-      else if (rightWall==false)
+        turned = true;
+      }
+      else if (rightWall==false) {
         turnRight();
-      else if (leftWall==true && rightWall==true && checkWall()) 
+        turned = true;
+      }
+      else if (leftWall==true && rightWall==true && checkWall()) {
         turnAround();
+        turned = true;
+      }
       else
         forwardOneSquare();
     }
 
     else {
-      if (rightWall==false)
+      if (rightWall==false) {
         turnRight();
-      else if (leftWall==false)
+        turned = true;
+      }
+      else if (leftWall==false) {
         turnLeft();
-      else if (leftWall==true && rightWall==true && checkWall()) 
+        turned = true;
+      }
+      else if (leftWall==true && rightWall==true && checkWall()) {
         turnAround();
+        turned = true;
+      }
       else
         forwardOneSquare();        
     }
