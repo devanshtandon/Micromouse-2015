@@ -240,7 +240,7 @@ void updateForward() {
   	location.x = 0;
   } else if (location.y <0) {
   	location.y = 0;
-  } else if (location.x > 17) {
+  } else if (location.y > 17) {
   	location.y = 17;
   } else if (location.x > 17) {
   	location.x = 17;
