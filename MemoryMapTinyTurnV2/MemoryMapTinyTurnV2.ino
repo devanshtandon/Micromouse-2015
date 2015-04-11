@@ -167,6 +167,7 @@ struct coord location;
 
 int dir;
 int goForward;
+int stopped;
 
 
 void setup() {
@@ -174,6 +175,7 @@ void setup() {
 location.y = 1;
 dir = FORWARD;
 goForward = 0;
+stopped = 1;
   
   Serial.begin(9600);
   PololuWheelEncoders::init(10,9,12,11);
@@ -338,7 +340,7 @@ void updateTurnAround() {
 //Give a direction (FORWARD, BACKWARD, LEFT, or RIGHT)
 //and the number of encoder counts to move.
 void go(int direction, int counts) {
-
+  stopped = 0;
   centre();
 
   resetEncoders();
@@ -709,6 +711,7 @@ void stopRobot() {
   digitalWrite(AIN2, HIGH);
   digitalWrite(BIN1, HIGH);  // stop right wheel
   digitalWrite(BIN2, HIGH);  
+  stopped = 1;
 }
 
 void forwardOneSquare() {
@@ -823,7 +826,7 @@ void detectWalls() {
         rightWall=false;
     }
     
-    
+    if (stopped == 1) {
     if (dir == FORWARD) {
       if (maze[location.x][location.y+1] == 2 ) {
         frontWall = true;
@@ -867,6 +870,6 @@ void detectWalls() {
       }
     }
     
-}
+}}
 
 
