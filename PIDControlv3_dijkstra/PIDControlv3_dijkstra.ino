@@ -293,7 +293,6 @@ public:
         
         a[pos] = x;
     }
-    
 };
 
 class Graph

@@ -9,10 +9,10 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <inttypes.h>
-#define START_SIZE (256)
+#define QUEUE_SIZE (300)
 #define INFINITY (255)
-#define MAZE_WIDTH (16)
-#define MAZE_HEIGHT (16)
+#define MAZE_WIDTH (6)
+#define MAZE_HEIGHT (6)
 #define PATH_LENGTH (100)
 
 // finds child 0 or child 1 of x (dir = 0 or 1, respectively)
@@ -21,11 +21,18 @@
 //finds parent of x
 #define Parent(x) (((x)-1)/2)
 
+struct coord *path[PATH_LENGTH];
+
 struct coord
 {
     int x;
     int y;
 };
+
+/*struct pathstruct
+{
+    struct coord **path;
+};*/
 
 struct node
 {
@@ -42,19 +49,17 @@ class PriorityQueue
 private:
     int size;
     int n;
-    struct node **p;
+    struct node *p[QUEUE_SIZE];
     
 public:
-    PriorityQueue(int newSize)
+    PriorityQueue()
     {
-        this->size = newSize;
-        this->n = 0;
-        this->p = (struct node **) malloc(sizeof(*this->p)*newSize);
+        size = QUEUE_SIZE;
+        n = 0;
     }
     
     ~PriorityQueue()
     {
-        free(this->p);
     }
     
     void
@@ -62,12 +67,6 @@ public:
     {
         this->p[this->n] = node;
         floatUp(this->n++);
-        printf("Size: %d\n", this->n);
-        
-        if(this->n >= this->size) {
-            this->size *= 2;
-            this->p = (struct node **)realloc(this->p, sizeof(struct node *)*(this->size));
-        }
     }
     
     struct node*
@@ -141,59 +140,47 @@ public:
 class Graph
 {
 private:
-    struct node ***nodes;
+    struct node nodes[MAZE_WIDTH][MAZE_HEIGHT];
     PriorityQueue *pqueue;
     
 public:
     Graph()
     {
-        pqueue = new PriorityQueue(START_SIZE);
-        // initialize two dimensional graph
-        this->nodes = (struct node ***) calloc(MAZE_WIDTH, sizeof(*(this->nodes)));
-        for(int i=0; i<MAZE_WIDTH; i++) {
-            this->nodes[i] = (struct node **) calloc(MAZE_HEIGHT, sizeof(*(this->nodes[i])));
-            for(int j=0; j<MAZE_HEIGHT; j++) {
-                this->nodes[i][j] = (struct node *) malloc(sizeof(*(this->nodes[i][j])));
-            }
-        }
+        pqueue = new PriorityQueue();
     }
     
     ~Graph()
     {
-        for(int i=0; i<MAZE_WIDTH; i++) {
-            free(this->nodes[i]);
-        }
-        free(this->nodes);
         delete pqueue;
     }
     
     void
     addNode(int x, int y, bool north, bool east, bool south, bool west) {
-        this->nodes[x][y]->x = x;
-        this->nodes[x][y]->y = y;
+        this->nodes[x][y].x = x;
+        this->nodes[x][y].y = y;
         
-        this->nodes[x][y]->direction[0] = north;
-        this->nodes[x][y]->direction[1] = east;
-        this->nodes[x][y]->direction[2] = south;
-        this->nodes[x][y]->direction[3] = west;
+        this->nodes[x][y].direction[0] = north;
+        this->nodes[x][y].direction[1] = east;
+        this->nodes[x][y].direction[2] = south;
+        this->nodes[x][y].direction[3] = west;
     }
     
-    coord **
-    shortestPath(coord start, coord finish) {
+    void
+    shortestPath(struct coord start, struct coord finish) {
         int i, alt;
-        struct coord neighbor, swap, **path, *pathpt;
+        struct coord neighbor, swap;
         struct node* smallest;
         
         for(int j = 0; j < MAZE_WIDTH; j++) {
             for(int i = 0; i < MAZE_HEIGHT; i++) {
                 if(i == start.x && j == start.y) {
-                    this->nodes[i][j]->distance = 0;
-                    this->nodes[i][j]->previous = 0;
-                    pqueue->enqueue(this->nodes[i][j]);
+                    this->nodes[i][j].distance = 0;
+                    this->nodes[i][j].previous = 0;
+                    pqueue->enqueue(&this->nodes[i][j]);
                 } else {
-                    this->nodes[i][j]->distance = INFINITY;
-                    this->nodes[i][j]->previous = 0;
-                    pqueue->enqueue(this->nodes[i][j]);
+                    this->nodes[i][j].distance = INFINITY;
+                    this->nodes[i][j].previous = 0;
+                    pqueue->enqueue(&this->nodes[i][j]);
                 }
             }
         }
@@ -202,12 +189,11 @@ public:
             smallest = pqueue->dequeue();
             
             if(smallest->x == finish.x && smallest->y == finish.y) {
-                path = (struct coord **) malloc(sizeof(*path)*PATH_LENGTH);
                 for(i = 0; smallest->previous != 0; i++) {
-                    pathpt = (struct coord *) malloc(sizeof(*pathpt));
-                    pathpt->x = smallest->x;
-                    pathpt->y = smallest->y;
-                    path[i] = pathpt;
+                    struct coord pathpt;
+                    pathpt.x = smallest->x;
+                    pathpt.y = smallest->y;
+                    path[i] = &pathpt;
                     smallest = smallest->previous;
                 }
                 
@@ -255,43 +241,44 @@ public:
                     
                     alt = smallest->distance + 1;
                     
-                    if(alt < this->nodes[neighbor.x][neighbor.y]->distance) {
-                        this->nodes[neighbor.x][neighbor.y]->distance = alt;
-                        this->nodes[neighbor.x][neighbor.y]->previous = smallest;
-                        pqueue->enqueue(this->nodes[neighbor.x][neighbor.y]);
+                    if(alt < this->nodes[neighbor.x][neighbor.y].distance) {
+                        this->nodes[neighbor.x][neighbor.y].distance = alt;
+                        this->nodes[neighbor.x][neighbor.y].previous = smallest;
+                        pqueue->enqueue(&this->nodes[neighbor.x][neighbor.y]);
                     }
                 }
             }
         }
-        return path;
+        
+        return;
     }
 };
 
 int main(int argc, char **argv) {
-    struct coord start, finish, **path;
+    struct coord start, finish;
     bool N, E, S, W;
     Graph *maze = new Graph();
+    
     for(int j = 0; j < MAZE_WIDTH; j++) {
         for (int i = 0; i < MAZE_HEIGHT; i++) {
             N = S = E = W = 0;
             if(i == 0) W = true;
             if(j == 0) S = true;
-            if(i == 15) E = true;
-            if(j == 15) N = true;
+            if(i == 5) E = true;
+            if(j == 5) N = true;
             maze->addNode(i, j, N, E, S, W);
         }
     }
     
     start.x = 0;
     start.y = 0;
-    finish.x = 15;
-    finish.y = 15;
+    finish.x = 5;
+    finish.y = 5;
     
-    path = maze->shortestPath(start, finish);
+    maze->shortestPath(start, finish);
     
     for(int i = 0; path[i] != 0; i++) {
         printf("x: %d, y: %d\n", path[i]->x, path[i]->y);
-        free(path[i]);
     }
     
     delete maze;
