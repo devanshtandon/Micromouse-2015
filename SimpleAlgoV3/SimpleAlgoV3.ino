@@ -313,21 +313,21 @@ void go(int direction, int counts) {
 void centre() {
   detectWalls();
   if (leftWall == true) {
-    while (READ_SENSOR[LEFT_FRONT]-READ_SENSOR[LEFT_BACK] > 5) {
+    while (READ_SENSOR(LEFT_FRONT) - READ_SENSOR(LEFT_BACK) > 5) {
       setMotorDirection(LEFT);
       setMotorSpeeds(10,10);
     }
-    while (READ_SENSOR[LEFT_BACK]-READ_SENSOR[LEFT_FRONT] > 5) {
+    while (READ_SENSOR(LEFT_BACK) - READ_SENSOR(LEFT_FRONT) > 5) {
       setMotorDirection(RIGHT);
       setMotorSpeeds(10,10);
     }
   }
   else if (rightWall == true) {
-    while (READ_SENSOR[RIGHT_FRONT]-READ_SENSOR[RIGHT_BACK] > 5) {
+    while (READ_SENSOR(RIGHT_FRONT) - READ_SENSOR(RIGHT_BACK) > 5) {
       setMotorDirection(RIGHT);
       setMotorSpeeds(10,10);
     }
-    while (READ_SENSOR[RIGHT_BACK]-READ_SENSOR[RIGHT_FRONT] > 5) {
+    while (READ_SENSOR(RIGHT_BACK) - READ_SENSOR(RIGHT_FRONT) > 5) {
       setMotorDirection(LEFT);
       setMotorSpeeds(10,10);
     }
