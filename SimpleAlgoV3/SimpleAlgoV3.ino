@@ -134,7 +134,7 @@ double enCountsL; // encoder counts
 double enCountsR;
 
 
-#define WALL_THRESHOLD (70)
+#define WALL_THRESHOLD (60)
 #define DELAY_DEBUG 1000
 
 boolean frontWall;
@@ -313,27 +313,28 @@ void go(int direction, int counts) {
 void wallFollow() {
 
   while(1) {
-    if (!checkWall())
-      forwardOneSquare();
+
+    detectWalls();
+    int randomNumber = random(2);
+    if (randomNumber == 0) {
+      if (leftWall==false)
+        turnLeft();
+      else if (rightWall==false)
+        turnRight();
+      else if (leftWall==true && rightWall==true && checkWall()) 
+        turnAround();
+      else
+        forwardOneSquare();
+    }
     else {
-      detectWalls();
-      int randomNumber = random(2);
-      if (randomNumber == 0) {
-        if (leftWall==false)
-          turnLeft();
-        else if (rightWall==false)
-          turnRight();
-        else
-          turnAround();
-      }
-      else {
-        if (rightWall==false)
-          turnRight();
-        else if (leftWall==false)
-          turnLeft();
-        else
-          turnAround();        
-      }
+      if (rightWall==false)
+        turnRight();
+      else if (leftWall==false)
+        turnLeft();
+      else if (leftWall==true && rightWall==true && checkWall()) 
+        turnAround();
+      else
+        forwardOneSquare();        
     }
     delay(1000);
   }
