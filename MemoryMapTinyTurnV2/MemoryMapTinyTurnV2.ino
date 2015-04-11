@@ -221,18 +221,30 @@ void loop() {
 
 void updateForward() {
   if (dir == FORWARD) {
+    if (leftWall && rightWall && maze[location.x][location.y-1] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     location.y++;
     
   }
   if (dir == BACKWARD) {
+    if (leftWall && rightWall && maze[location.x][location.y+1] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     location.y--;
    
   }
   if (dir == LEFT) {
+    if (leftWall && rightWall && maze[location.x+1][location.y] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     location.x--;
    
   }
   if (dir == RIGHT) {
+    if (leftWall && rightWall && maze[location.x-1][location.y] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     location.x++;
    
   }
@@ -245,38 +257,63 @@ void updateForward() {
   } else if (location.x > 15) {
     location.x = 15;
   }
-  if (maze[location.x][location.y] == 0) {
-    maze[location.x][location.y] = 1;
+  if (maze[location.x][location.y] <1000) {
+    maze[location.x][location.y]++;
   }
+  
 }
 
 //updating when turning right
 void updateRight() {
    if (dir == FORWARD) {
+     if (leftWall && frontWall && maze[location.x][location.y-1] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     dir = RIGHT;
   } else 
   if (dir == BACKWARD) {
+    if (leftWall && frontWall && maze[location.x][location.y+1] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     dir = LEFT;
   } else
   if (dir == LEFT) {
+    if (leftWall && frontWall && maze[location.x+1][location.y] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     dir = FORWARD;
   }
   else if (dir == RIGHT) {
+    if (leftWall && frontWall && maze[location.x-1][location.y] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     dir = BACKWARD;
   }
 }
 //updatewhen turning  left
 void updateLeft() {
    if (dir == FORWARD) {
+     if (rightWall && frontWall && maze[location.x][location.y-1] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     dir = LEFT;
   }
   else if (dir == BACKWARD) {
+    if (rightWall && frontWall && maze[location.x][location.y+1] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     dir = RIGHT;
   } else
   if (dir == LEFT) {
+    if (rightWall && frontWall && maze[location.x+1][location.y] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     dir = BACKWARD;
   } else
   if (dir == RIGHT) {
+    if (rightWall && frontWall && maze[location.x-1][location.y] == 1000) {
+      maze[location.x][location.y] = 1000;
+    }
     dir = FORWARD;
   }
 }
@@ -294,7 +331,7 @@ void updateTurnAround() {
   if (dir == RIGHT) {
     dir = LEFT;
   }
-  maze[location.x][location.y] = 2;
+  maze[location.x][location.y] = 1000;
 }
 
 
@@ -787,15 +824,47 @@ void detectWalls() {
     }
     
     
-    if (dir == FORWARD && maze[location.x][location.y+1] == 2  && rightWall && leftWall) {
-      frontWall = true;
+    if (dir == FORWARD) {
+      if (maze[location.x][location.y+1] == 2 ) {
+        frontWall = true;
+      }
+      if (maze[location.x-1][location.y] == 2 ) {
+        leftWall = true;
+      }
+      if (maze[location.x+1][location.y] == 2 ) {
+        rightWall = true;
+      }
     }
-    else if (dir == RIGHT && maze[location.x+1][location.y] == 2 && rightWall && leftWall) {
-      frontWall = true;
-    } else if (dir == LEFT && maze[location.x-1][location.y] == 2  && rightWall && leftWall) {
-      frontWall = true;
-    } else if (dir == BACKWARD && maze[location.x][location.y-1] == 2  && rightWall && leftWall) {
-      frontWall = true;
+    else if (dir == BACKWARD) {
+      if (maze[location.x][location.y-1] == 2 ) {
+        frontWall = true;
+      }
+      if (maze[location.x+1][location.y] == 2 ) {
+        leftWall = true;
+      }
+      if (maze[location.x-1][location.y] == 2 ) {
+        rightWall = true;
+      }
+    } else if  (dir == RIGHT) {
+      if (maze[location.x+1][location.y] == 2 ) {
+        frontWall = true;
+      }
+      if (maze[location.x][location.y+1] == 2 ) {
+        leftWall = true;
+      }
+      if (maze[location.x][location.y-1] == 2 ) {
+        rightWall = true;
+      }
+    } else {
+      if (maze[location.x-1][location.y] == 2 ) {
+        frontWall = true;
+      }
+      if (maze[location.x][location.y-1] == 2 ) {
+        leftWall = true;
+      }
+      if (maze[location.x][location.y+1] == 2 ) {
+        rightWall = true;
+      }
     }
     
 }
