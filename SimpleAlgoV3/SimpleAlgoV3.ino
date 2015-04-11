@@ -288,7 +288,7 @@ void go(int direction, int counts) {
 
   else {
     // go forward till it is close enough to front wall to turn
-    while(!wallClose) {
+    while(frontWall==true && !wallClose) {
       // int diff=0;
       // diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
       // myPID.Compute(); 
@@ -316,6 +316,7 @@ void wallFollow() {
 
     detectWalls();
     int randomNumber = random(2);
+
     if (randomNumber == 0) {
       if (leftWall==false)
         turnLeft();
@@ -326,6 +327,7 @@ void wallFollow() {
       else
         forwardOneSquare();
     }
+
     else {
       if (rightWall==false)
         turnRight();
@@ -336,6 +338,7 @@ void wallFollow() {
       else
         forwardOneSquare();        
     }
+
     delay(1000);
   }
 
