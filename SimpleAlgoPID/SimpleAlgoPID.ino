@@ -149,8 +149,28 @@ boolean southWall;
 
 bool adjustToFrontWall = false;
 
+struct coord {
+  int x;
+  int y;
+};
+
+#define SEEN (4)
+#define UNSEEN (5)
+
+//should be GLOBAL maze
+char maze[16][16];
+int randomNumber = random(1);
+//should be global location
+struct coord location;
+
+
+
+int dir;
 
 void setup() {
+  location.x = 0;
+location.y = 0;
+dir = FORWARD;
   
   Serial.begin(9600);
   PololuWheelEncoders::init(10,9,12,11);
@@ -174,6 +194,12 @@ void setup() {
   myPID.SetMode(pidSwitch);
 
   randomSeed(20);
+  
+  for (int i = 0; i<16; i++) {
+	for (int j = 0; j<16; j++) {
+	maze[i][j] = UNSEEN;
+	}
+}
 
   Serial.println ("SETUP COMPELETE");
   delay(2000);
@@ -186,28 +212,7 @@ void loop() {
 
 
 }
-struct coord {
-  int x;
-  int y;
-}
 
-#define SEEN (4)
-#define UNSEEN (5)
-
-//should be GLOBAL maze
-char maze[16][16];
-for (int i = 0; i<16; i++) {
-	for int j = 0; j<16; j++) {
-	maze[i][j] = UNSEEN;
-	}
-}
-//should be global location
-struct coord location;
-location.x = 0;
-location.y = 0;
-
-maze[0][0] = LOCATION;
-int dir = FORWARD;
 
 //updating when moving forward
 
@@ -420,7 +425,6 @@ void wallFollow() {
       
     }
     else if (frontWall) { 
-      int randomNumber = random(1);
       adjustToFrontWall = true;
       if (dir == FORWARD) {
         if (maze[location.x+1][location.y] == UNSEEN && maze[location.x-1][location.y] == SEEN) {
