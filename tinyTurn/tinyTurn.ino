@@ -135,7 +135,7 @@ double enCountsR;
 
 
 #define WALL_THRESHOLD (60)
-#define DELAY_DEBUG 500
+#define DELAY_DEBUG 200
 
 boolean frontWall;
 boolean rightWall;
@@ -173,7 +173,7 @@ void setup() {
   randomSeed(20);
 
   Serial.println ("SETUP COMPELETE");
-  delay(500);
+  delay(200);
 }
 
 
@@ -312,6 +312,7 @@ void go(int direction, int counts) {
 
 void centre() {
   detectWalls();
+  
   if (leftWall == true) {
     while (READ_SENSOR(LEFT_FRONT) - READ_SENSOR(LEFT_BACK) > 2) {
       setMotorDirection(LEFT);
@@ -337,7 +338,7 @@ void centre() {
     // you are fucked.
   }
   stopRobot();
-  delay(500);
+  delay(200);
 }
 
 // simple algorithm
@@ -353,7 +354,7 @@ void wallFollow() {
     if (turned) {
       forwardOneSquare();
       turned = false;
-      delay(500);
+      delay(200);
     }
 
     if (randomNumber == 0) {
