@@ -468,6 +468,49 @@ void wallFollow() {
 
   while(1) {
     detectWalls();
+     
+    if (dir == FORWARD) {
+      if (maze[location.x][location.y+1] == 2 ) {
+        frontWall = true;
+      }
+      if (maze[location.x-1][location.y] == 2 ) {
+        leftWall = true;
+      }
+      if (maze[location.x+1][location.y] == 2 ) {
+        rightWall = true;
+      }
+    }
+    else if (dir == BACKWARD) {
+      if (maze[location.x][location.y-1] == 2 ) {
+        frontWall = true;
+      }
+      if (maze[location.x+1][location.y] == 2 ) {
+        leftWall = true;
+      }
+      if (maze[location.x-1][location.y] == 2 ) {
+        rightWall = true;
+      }
+    } else if  (dir == RIGHT) {
+      if (maze[location.x+1][location.y] == 2 ) {
+        frontWall = true;
+      }
+      if (maze[location.x][location.y+1] == 2 ) {
+        leftWall = true;
+      }
+      if (maze[location.x][location.y-1] == 2 ) {
+        rightWall = true;
+      }
+    } else {
+      if (maze[location.x-1][location.y] == 2 ) {
+        frontWall = true;
+      }
+      if (maze[location.x][location.y-1] == 2 ) {
+        leftWall = true;
+      }
+      if (maze[location.x][location.y+1] == 2 ) {
+        rightWall = true;
+      }
+    }
     if (leftWall && rightWall && frontWall) {
       adjustToFrontWall = true;
       turnAround();
@@ -715,6 +758,7 @@ void stopRobot() {
 }
 
 void forwardOneSquare() {
+  detectWalls();
   go(FORWARD, 1*SQUARE);
   updateForward();
 }
@@ -724,16 +768,19 @@ void backwardOneSquare() {
 }
 
 void turnRight() {
+  detectWalls();
   go(RIGHT, 1*TURN);
   updateRight();
 }
 
 void turnLeft() {
+  detectWalls();
   go(LEFT, 1*TURN);
   updateLeft();
 }
 
 void turnAround() {
+  detectWalls();
   go(LEFT, 1*TURN);
   delay(DELAY_DEBUG);
   go(LEFT, 1*TURN);
@@ -826,49 +873,7 @@ void detectWalls() {
         rightWall=false;
     }
     
-    if (stopped == 1) {
-    if (dir == FORWARD) {
-      if (maze[location.x][location.y+1] == 2 ) {
-        frontWall = true;
-      }
-      if (maze[location.x-1][location.y] == 2 ) {
-        leftWall = true;
-      }
-      if (maze[location.x+1][location.y] == 2 ) {
-        rightWall = true;
-      }
-    }
-    else if (dir == BACKWARD) {
-      if (maze[location.x][location.y-1] == 2 ) {
-        frontWall = true;
-      }
-      if (maze[location.x+1][location.y] == 2 ) {
-        leftWall = true;
-      }
-      if (maze[location.x-1][location.y] == 2 ) {
-        rightWall = true;
-      }
-    } else if  (dir == RIGHT) {
-      if (maze[location.x+1][location.y] == 2 ) {
-        frontWall = true;
-      }
-      if (maze[location.x][location.y+1] == 2 ) {
-        leftWall = true;
-      }
-      if (maze[location.x][location.y-1] == 2 ) {
-        rightWall = true;
-      }
-    } else {
-      if (maze[location.x-1][location.y] == 2 ) {
-        frontWall = true;
-      }
-      if (maze[location.x][location.y-1] == 2 ) {
-        leftWall = true;
-      }
-      if (maze[location.x][location.y+1] == 2 ) {
-        rightWall = true;
-      }
-    }
+   
     
 }}
 
