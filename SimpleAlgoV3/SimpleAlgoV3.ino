@@ -135,7 +135,7 @@ double enCountsR;
 
 
 #define WALL_THRESHOLD (60)
-#define DELAY_DEBUG 1000
+#define DELAY_DEBUG 500
 
 boolean frontWall;
 boolean rightWall;
@@ -173,7 +173,7 @@ void setup() {
   randomSeed(20);
 
   Serial.println ("SETUP COMPELETE");
-  delay(2000);
+  delay(500);
 }
 
 
@@ -191,6 +191,7 @@ void loop() {
 void go(int direction, int counts) {
 
   centre();
+
   resetEncoders();
   setMotorSpeeds(spL,spR);
   setMotorDirection(direction);
@@ -320,6 +321,7 @@ void centre() {
       setMotorDirection(RIGHT);
       setMotorSpeeds(10,10);
     }
+    delay(500);
   }
   else if (rightWall == true) {
     while (READ_SENSOR(RIGHT_FRONT) - READ_SENSOR(RIGHT_BACK) > 5) {
@@ -330,6 +332,7 @@ void centre() {
       setMotorDirection(LEFT);
       setMotorSpeeds(10,10);
     }
+    delay(500);
   }
   else {
     // no centre-ing possible
@@ -387,7 +390,7 @@ void wallFollow() {
         forwardOneSquare();        
     }
 
-    delay(1000);
+    delay(500);
   }
 
 }
@@ -467,7 +470,7 @@ void turnLeft() {
 
 void turnAround() {
   go(LEFT, 1*TURN);
-  delay(1000);
+  delay(500);
   go(LEFT, 1*TURN);
 }
 
