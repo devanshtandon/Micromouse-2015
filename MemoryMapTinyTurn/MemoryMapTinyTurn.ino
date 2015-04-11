@@ -155,7 +155,7 @@ struct coord {
 };
 
 #define SEEN (4)
-#define UNSEEN (0)
+#define UNSEEN (5)
 
 //should be GLOBAL maze
 char maze[16][16];
@@ -241,7 +241,7 @@ void updateForward() {
   } else if (location.x > 15) {
     location.x = 15;
   }
-  maze[location.x][location.y]++;
+  maze[location.x][location.y] = SEEN;
 }
 
 //updating when turning right
@@ -418,7 +418,7 @@ void go(int direction, int counts) {
 
 
 // simple algorithm
-/*void wallFollow() {
+void wallFollow() {
 
   while(1) {
     detectWalls();
@@ -563,208 +563,6 @@ void go(int direction, int counts) {
           if (maze[location.x-1][location.y] == SEEN && maze[location.x][location.y+1] == UNSEEN) {
           turnRight(); goForward = 1;
         } else if (maze[location.x-1][location.y] == UNSEEN && maze[location.x][location.y+1] == SEEN) {
-          forwardOneSquare();
-        } else if (randomNumber) {
-          forwardOneSquare();
-        } else {
-          turnLeft(); goForward = 1;
-        }
-      }    
-    }
-    else {
-      int randNumber3 = random(2);
-      if (dir == FORWARD) {
-        if (maze[location.x-1][location.y] == UNSEEN) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x+1][location.y] == UNSEEN ) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x][location.y+1] == UNSEEN ) {
-          forwardOneSquare();
-        } else {
-          turnLeft(); goForward = 1;
-        }
-      } else if (dir == BACKWARD) {
-         if (maze[location.x+1][location.y] == UNSEEN) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x-1][location.y] == UNSEEN ) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x][location.y-1] == UNSEEN ) {
-          forwardOneSquare();
-        } else {
-          turnLeft(); goForward = 1;
-        }
-      } else if (dir == RIGHT) {
-          if (maze[location.x][location.y+1] == UNSEEN) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x][location.y-1] == UNSEEN ) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x+1][location.y] == UNSEEN ) {
-          forwardOneSquare();
-        } else {
-          turnLeft(); goForward = 1;
-        }
-        
-      } else {
-           if (maze[location.x][location.y-1] == UNSEEN) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x][location.y+1] == UNSEEN ) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x-1][location.y] == UNSEEN ) {
-          forwardOneSquare();
-        } else {
-          turnLeft(); goForward = 1;
-        }
-      }
-    }
-    delay(200);
-  }
-
-}*/
-void wallFollow() {
-
-  while(1) {
-    detectWalls();
-    if (leftWall && rightWall && frontWall) {
-      adjustToFrontWall = true;
-      turnAround();
-    }
-    else if (leftWall && rightWall) {
-      forwardOneSquare();
-    }
-    else if (leftWall && frontWall) {
-      adjustToFrontWall = true;
-      turnRight();
-    }
-    else if (rightWall && frontWall) {
-      adjustToFrontWall = true;
-      turnLeft();
-      
-    }
-    else if (goForward == 1) {
-      forwardOneSquare();
-      goForward = 0;
-      } else if (frontWall) { 
-      adjustToFrontWall = true;
-      if (dir == FORWARD) {
-        if (maze[location.x+1][location.y] <maze[location.x-1][location.y]) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x+1][location.y] >maze[location.x-1][location.y]) {
-          turnLeft();  goForward = 1;
-        } else if (randomNumber) {
-          turnLeft();  goForward = 1;
-        } else {
-          turnRight; goForward = 1;
-        }
-      } else if (dir == BACKWARD) {
-        if (maze[location.x+1][location.y] <maze[location.x-1][location.y] ) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x+1][location.y] >maze[location.x-1][location.y]) {
-          turnRight(); goForward = 1;
-        } else if (randomNumber) {
-          turnRight(); goForward = 1;
-        } else {
-          turnLeft; goForward = 1;
-        }
-      } else if (dir == LEFT) {
-        if (maze[location.x][location.y+1] <maze[location.x][location.y-1]) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x][location.y+1] >maze[location.x][location.y-1]) {
-          turnLeft(); goForward = 1;
-        } else if (randomNumber) {
-          turnLeft(); goForward = 1;
-        } else {
-          turnRight; goForward = 1;
-        }
-      } else {
-        if (maze[location.x+1][location.y] <maze[location.x-1][location.y]) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x+1][location.y] >maze[location.x-1][location.y]) {
-          turnRight(); goForward = 1;
-        } else if (randomNumber) {
-          turnRight(); goForward = 1;
-        } else {
-          turnLeft; goForward = 1;
-        }
-      }
-    }
-    else if (rightWall) {
-      if (dir == FORWARD) {
-        if (maze[location.x-1][location.y] <maze[location.x][location.y+1]) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x-1][location.y] >maze[location.x][location.y+1]) {
-          forwardOneSquare();
-        } else if (randomNumber) {
-          forwardOneSquare();
-        } else {
-          turnLeft(); goForward = 1;
-        }
-      } else if (dir == BACKWARD) {
-        if (maze[location.x+1][location.y] <maze[location.x][location.y-1] ) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x+1][location.y] >maze[location.x][location.y-1]) {
-          forwardOneSquare();
-        } else if (randomNumber) {
-          forwardOneSquare();
-        } else {
-          turnLeft(); goForward = 1;
-        } 
-        }else if (dir == RIGHT) {
-          if (maze[location.x+1][location.y]>maze[location.x][location.y+1]) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x+1][location.y] <maze[location.x][location.y+1] ) {
-          forwardOneSquare();
-        } else if (randomNumber) {
-          forwardOneSquare();
-        } else {
-          turnLeft(); goForward = 1;
-        } 
-     }else {
-          if (maze[location.x-1][location.y] >maze[location.x][location.y-1] ) {
-          turnLeft(); goForward = 1;
-        } else if (maze[location.x-1][location.y] <maze[location.x][location.y-1]) {
-          forwardOneSquare();
-        } else if (randomNumber) {
-          forwardOneSquare();
-        } else {
-          turnLeft(); goForward = 1;
-        }
-      }
-    }
-    else if (leftWall) {
-       if (dir == FORWARD) {
-        if (maze[location.x+1][location.y] <maze[location.x][location.y+1]) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x+1][location.y]>maze[location.x][location.y+1]) {
-          forwardOneSquare();
-        } else if (randomNumber) {
-          forwardOneSquare();
-        } else {
-          turnRight(); goForward = 1;
-        }
-      } else if (dir == BACKWARD) {
-        if (maze[location.x-1][location.y] <maze[location.x][location.y-1]) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x-1][location.y] >maze[location.x][location.y-1]) {
-          forwardOneSquare();
-        } else if (randomNumber) {
-          forwardOneSquare();
-        } else {
-          turnRight(); goForward = 1;
-        } 
-        }else if (dir == RIGHT) {
-          if (maze[location.x+1][location.y] >maze[location.x][location.y-1]) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x+1][location.y] <maze[location.x][location.y-1]) {
-          forwardOneSquare();
-        } else if (randomNumber) {
-          forwardOneSquare();
-        } else {
-          turnRight(); goForward = 1;
-        } 
-     }else {
-          if (maze[location.x-1][location.y] >maze[location.x][location.y+1]) {
-          turnRight(); goForward = 1;
-        } else if (maze[location.x-1][location.y] <maze[location.x][location.y+1]) {
           forwardOneSquare();
         } else if (randomNumber) {
           forwardOneSquare();
@@ -981,5 +779,3 @@ void detectWalls() {
         rightWall=false;
     }
 }
-
-
