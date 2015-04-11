@@ -170,6 +170,8 @@ void setup() {
   myPID.SetOutputLimits(-255, 255);
   myPID.SetMode(pidSwitch);
 
+  RandomSeed(20);
+
   Serial.println ("SETUP COMPELETE");
   delay(2000);
 }
@@ -311,6 +313,15 @@ void go(int direction, int counts) {
 void wallFollow() {
 
   while(1) {
+    detectWalls();
+    randNumber3 = random(2)
+    if (leftWall && rightWall) {
+      forwardOneSquare();
+    }
+    else if (!leftWall && !rightWall && ! frontWall) {
+      if (randNumber3
+    }
+
     if (!checkWall())
       forwardOneSquare();
     else {
