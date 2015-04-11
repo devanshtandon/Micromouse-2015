@@ -158,7 +158,7 @@ struct coord {
 #define UNSEEN (5)
 
 //should be GLOBAL maze
-char maze[16][16];
+char maze[18][18];
 int randomNumber = random(2);
 //should be global location
 struct coord location;
@@ -167,12 +167,13 @@ struct coord location;
 
 int dir;
 int goForward;
-goForward = 0;
+
 
 void setup() {
-  location.x = 0;
-location.y = 0;
+  location.x = 1;
+location.y = 1;
 dir = FORWARD;
+goForward = 0;
   
   Serial.begin(9600);
   PololuWheelEncoders::init(10,9,12,11);
@@ -197,10 +198,14 @@ dir = FORWARD;
 
   randomSeed(20);
   
-  for (int i = 0; i<16; i++) {
-	for (int j = 0; j<16; j++) {
+  for (int i = 0; i<18; i++) {
+	for (int j = 0; j<18; j++) {
 	maze[i][j] = UNSEEN;
 	}
+}
+for (i = 0; i<18; i++) {
+	maze[0][i] = maze[17][i] = SEEN;
+	maze[i][0] = maze[i][17] = SEEN;
 }
 
   Serial.println ("SETUP COMPELETE");
@@ -230,6 +235,15 @@ void updateForward() {
   }
   if (dir == RIGHT) {
     location.x++;
+  }
+  if (location.x<0) {
+  	location.x = 0;
+  } else if (location.y <0) {
+  	location.y = 0;
+  } else if (location.x > 17) {
+  	location.y = 17;
+  } else if (location.x > 17) {
+  	location.x = 17;
   }
   maze[location.x][location.y] = SEEN;
 }
