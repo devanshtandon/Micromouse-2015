@@ -147,6 +147,9 @@ boolean westWall;
 boolean southWall;
 
 
+bool adjustToFrontWall = false;
+
+
 void setup() {
   
   Serial.begin(9600);
@@ -288,7 +291,7 @@ void go(int direction, int counts) {
 
   else {
     // go forward till it is close enough to front wall to turn
-    while(!wallClose) {
+    while(!wallClose && adjustToFrontWall) {
       // int diff=0;
       // diff += READ_SENSOR(LEFT_FRONT)-READ_SENSOR(RIGHT_FRONT);
       // myPID.Compute(); 
@@ -297,6 +300,7 @@ void go(int direction, int counts) {
       wallClose = checkWall();
     }
 
+    adjustToFrontWall = false;
     setMotorDirection(direction);
     while(abs(enCountsL)<counts) {
       enCountsL = encoders.getCountsM1();
@@ -314,25 +318,52 @@ void wallFollow() {
 
   while(1) {
     detectWalls();
-    randNumber3 = random(2)
-    if (leftWall && rightWall) {
+    randNumber2 = random(1)
+    if (leftWall && rightWall && frontWall) {
+      adjustToFrontWall = true;
+      turnAround();
+    }
+    else if (leftWall && rightWall) {
       forwardOneSquare();
     }
-    else if (!leftWall && !rightWall && ! frontWall) {
-      if (randNumber3
+    else if (leftWall && frontWall) {
+      adjustToFrontWall = true;
+      turnRight();
+    }
+    else if (rightWall && frontWall) {
+      adjustToFrontWall = true;
+      turnLeft();
+    }
+    else if (frontWall) { 
+      adjustToFrontWall = true;
+      if (randNumber2 == 0)
+        turnLeft();
+      else
+        turnRight();
+    }
+    else if (rightWall) {
+      if (randNumber2 == 0)
+        forwardOneSquare();
+      else
+        turnLeft();
+    }
+    else if (leftWall) {
+       if (randNumber2 == 0)
+        forwardOneSquare();
+      else
+        turnRight();     
+    }
+    else {
+      randNumber3 = random(2)
+      if (randNumber3 == 0)
+        forwardOneSquare();
+      else if (randNumber3 == 1)
+        turnLeft();
+      else
+        turnRight();
     }
 
-    if (!checkWall())
-      forwardOneSquare();
-    else {
-      getSensors();
-      if (sensorValues[LEFT_FRONT] > 45 && sensorValues[LEFT_BACK] > 45)
-        turnLeft();
-      else if (sensorValues[RIGHT_FRONT] > 45 && sensorValues[RIGHT_BACK] > 45)
-        turnRight();
-      else
-        turnAround();
-    }
+
     delay(1000);
   }
 
