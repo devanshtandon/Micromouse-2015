@@ -222,15 +222,19 @@ void loop() {
 void updateForward() {
   if (dir == FORWARD) {
     location.y++;
+    
   }
   if (dir == BACKWARD) {
     location.y--;
+   
   }
   if (dir == LEFT) {
     location.x--;
+   
   }
   if (dir == RIGHT) {
     location.x++;
+   
   }
   if (location.x<0) {
     location.x = 0;
@@ -241,7 +245,9 @@ void updateForward() {
   } else if (location.x > 15) {
     location.x = 15;
   }
-  maze[location.x][location.y]++;
+  if (maze[location.x][location.y] == 0) {
+    maze[location.x][location.y] = 1;
+  }
 }
 
 //updating when turning right
@@ -288,6 +294,7 @@ void updateTurnAround() {
   if (dir == RIGHT) {
     dir = LEFT;
   }
+  maze[location.x][location.y] = 2;
 }
 
 
