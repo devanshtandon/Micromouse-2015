@@ -530,6 +530,4 @@ void detectWalls() {
     } else {
         rightWall=false;
     }
-    
-
 }
