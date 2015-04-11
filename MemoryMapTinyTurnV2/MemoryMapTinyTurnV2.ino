@@ -135,7 +135,7 @@ double enCountsR;
 
 
 #define WALL_THRESHOLD (70)
-#define DELAY_DEBUG 200
+#define DELAY_DEBUG 1000
 
 boolean frontWall;
 boolean rightWall;
@@ -167,7 +167,6 @@ struct coord location;
 
 int dir;
 int goForward;
-int stopped;
 
 
 void setup() {
@@ -175,7 +174,6 @@ void setup() {
 location.y = 1;
 dir = FORWARD;
 goForward = 0;
-stopped = 1;
   
   Serial.begin(9600);
   PololuWheelEncoders::init(10,9,12,11);
@@ -208,7 +206,7 @@ stopped = 1;
 
 
   Serial.println ("SETUP COMPELETE");
-  delay(DELAY_DEBUG);
+  delay(200);
 }
 
 
@@ -223,32 +221,16 @@ void loop() {
 
 void updateForward() {
   if (dir == FORWARD) {
-    if (leftWall && rightWall && maze[location.x][location.y-1] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     location.y++;
-    
   }
   if (dir == BACKWARD) {
-    if (leftWall && rightWall && maze[location.x][location.y+1] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     location.y--;
-   
   }
   if (dir == LEFT) {
-    if (leftWall && rightWall && maze[location.x+1][location.y] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     location.x--;
-   
   }
   if (dir == RIGHT) {
-    if (leftWall && rightWall && maze[location.x-1][location.y] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     location.x++;
-   
   }
   if (location.x<0) {
     location.x = 0;
@@ -259,63 +241,36 @@ void updateForward() {
   } else if (location.x > 15) {
     location.x = 15;
   }
-  if (maze[location.x][location.y] <1000) {
-    maze[location.x][location.y]++;
-  }
-  
+  maze[location.x][location.y]++;
 }
 
 //updating when turning right
 void updateRight() {
    if (dir == FORWARD) {
-     if (leftWall && frontWall && maze[location.x][location.y-1] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     dir = RIGHT;
   } else 
   if (dir == BACKWARD) {
-    if (leftWall && frontWall && maze[location.x][location.y+1] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     dir = LEFT;
   } else
   if (dir == LEFT) {
-    if (leftWall && frontWall && maze[location.x+1][location.y] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     dir = FORWARD;
   }
   else if (dir == RIGHT) {
-    if (leftWall && frontWall && maze[location.x-1][location.y] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     dir = BACKWARD;
   }
 }
 //updatewhen turning  left
 void updateLeft() {
    if (dir == FORWARD) {
-     if (rightWall && frontWall && maze[location.x][location.y-1] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     dir = LEFT;
   }
   else if (dir == BACKWARD) {
-    if (rightWall && frontWall && maze[location.x][location.y+1] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     dir = RIGHT;
   } else
   if (dir == LEFT) {
-    if (rightWall && frontWall && maze[location.x+1][location.y] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     dir = BACKWARD;
   } else
   if (dir == RIGHT) {
-    if (rightWall && frontWall && maze[location.x-1][location.y] == 1000) {
-      maze[location.x][location.y] = 1000;
-    }
     dir = FORWARD;
   }
 }
@@ -333,14 +288,14 @@ void updateTurnAround() {
   if (dir == RIGHT) {
     dir = LEFT;
   }
-  maze[location.x][location.y] = 1000;
+  maze[location.x][location.y] = 100;
 }
 
 
 //Give a direction (FORWARD, BACKWARD, LEFT, or RIGHT)
 //and the number of encoder counts to move.
 void go(int direction, int counts) {
-  stopped = 0;
+
   centre();
 
   resetEncoders();
@@ -492,7 +447,7 @@ void wallFollow() {
       if (dir == FORWARD) {
         if (maze[location.x+1][location.y] <maze[location.x-1][location.y]) {
           turnRight(); goForward = 1;
-        } else if (maze[location.x+1][location.y] >maze[location.x-1][location.y]) {
+        } else if (maze[location.x+1][location.y] >maze[location.x-1][location.y] ) {
           turnLeft();  goForward = 1;
         } else if (randomNumber) {
           turnLeft();  goForward = 1;
@@ -502,7 +457,7 @@ void wallFollow() {
       } else if (dir == BACKWARD) {
         if (maze[location.x+1][location.y] <maze[location.x-1][location.y] ) {
           turnLeft(); goForward = 1;
-        } else if (maze[location.x+1][location.y] >maze[location.x-1][location.y]) {
+        } else if (maze[location.x+1][location.y] >maze[location.x-1][location.y] ) {
           turnRight(); goForward = 1;
         } else if (randomNumber) {
           turnRight(); goForward = 1;
@@ -512,7 +467,7 @@ void wallFollow() {
       } else if (dir == LEFT) {
         if (maze[location.x][location.y+1] <maze[location.x][location.y-1]) {
           turnRight(); goForward = 1;
-        } else if (maze[location.x][location.y+1] >maze[location.x][location.y-1]) {
+        } else if (maze[location.x][location.y+1] >maze[location.x][location.y-1] ) {
           turnLeft(); goForward = 1;
         } else if (randomNumber) {
           turnLeft(); goForward = 1;
@@ -520,9 +475,9 @@ void wallFollow() {
           turnRight; goForward = 1;
         }
       } else {
-        if (maze[location.x+1][location.y] <maze[location.x-1][location.y]) {
+        if (maze[location.x+1][location.y] < maze[location.x-1][location.y] ) {
           turnLeft(); goForward = 1;
-        } else if (maze[location.x+1][location.y] >maze[location.x-1][location.y]) {
+        } else if (maze[location.x+1][location.y]>maze[location.x-1][location.y] ) {
           turnRight(); goForward = 1;
         } else if (randomNumber) {
           turnRight(); goForward = 1;
@@ -533,9 +488,9 @@ void wallFollow() {
     }
     else if (rightWall) {
       if (dir == FORWARD) {
-        if (maze[location.x-1][location.y] <maze[location.x][location.y+1]) {
+        if (maze[location.x-1][location.y] < maze[location.x][location.y+1] ) {
           turnLeft(); goForward = 1;
-        } else if (maze[location.x-1][location.y] >maze[location.x][location.y+1]) {
+        } else if (maze[location.x-1][location.y] > maze[location.x][location.y+1] ) {
           forwardOneSquare();
         } else if (randomNumber) {
           forwardOneSquare();
@@ -543,9 +498,9 @@ void wallFollow() {
           turnLeft(); goForward = 1;
         }
       } else if (dir == BACKWARD) {
-        if (maze[location.x+1][location.y] <maze[location.x][location.y-1] ) {
+        if (maze[location.x+1][location.y] < maze[location.x][location.y-1] ) {
           turnLeft(); goForward = 1;
-        } else if (maze[location.x+1][location.y] >maze[location.x][location.y-1]) {
+        } else if (maze[location.x+1][location.y] >maze[location.x][location.y-1] ) {
           forwardOneSquare();
         } else if (randomNumber) {
           forwardOneSquare();
@@ -553,9 +508,9 @@ void wallFollow() {
           turnLeft(); goForward = 1;
         } 
         }else if (dir == RIGHT) {
-          if (maze[location.x+1][location.y]>maze[location.x][location.y+1]) {
+          if (maze[location.x+1][location.y] >maze[location.x][location.y+1] ) {
           turnLeft(); goForward = 1;
-        } else if (maze[location.x+1][location.y] <maze[location.x][location.y+1] ) {
+        } else if (maze[location.x+1][location.y] < maze[location.x][location.y+1] ) {
           forwardOneSquare();
         } else if (randomNumber) {
           forwardOneSquare();
@@ -565,7 +520,7 @@ void wallFollow() {
      }else {
           if (maze[location.x-1][location.y] >maze[location.x][location.y-1] ) {
           turnLeft(); goForward = 1;
-        } else if (maze[location.x-1][location.y] <maze[location.x][location.y-1]) {
+        } else if (maze[location.x-1][location.y] < maze[location.x][location.y-1] ) {
           forwardOneSquare();
         } else if (randomNumber) {
           forwardOneSquare();
@@ -576,9 +531,9 @@ void wallFollow() {
     }
     else if (leftWall) {
        if (dir == FORWARD) {
-        if (maze[location.x+1][location.y] <maze[location.x][location.y+1]) {
+        if (maze[location.x+1][location.y] < maze[location.x][location.y+1] ) {
           turnRight(); goForward = 1;
-        } else if (maze[location.x+1][location.y]>maze[location.x][location.y+1]) {
+        } else if (maze[location.x+1][location.y] > maze[location.x][location.y+1]) {
           forwardOneSquare();
         } else if (randomNumber) {
           forwardOneSquare();
@@ -586,9 +541,9 @@ void wallFollow() {
           turnRight(); goForward = 1;
         }
       } else if (dir == BACKWARD) {
-        if (maze[location.x-1][location.y] <maze[location.x][location.y-1]) {
+        if (maze[location.x-1][location.y] < maze[location.x][location.y-1]) {
           turnRight(); goForward = 1;
-        } else if (maze[location.x-1][location.y] >maze[location.x][location.y-1]) {
+        } else if (maze[location.x-1][location.y] > maze[location.x][location.y-1]) {
           forwardOneSquare();
         } else if (randomNumber) {
           forwardOneSquare();
@@ -596,9 +551,9 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } 
         }else if (dir == RIGHT) {
-          if (maze[location.x+1][location.y] >maze[location.x][location.y-1]) {
+          if (maze[location.x+1][location.y] > maze[location.x][location.y-1] ) {
           turnRight(); goForward = 1;
-        } else if (maze[location.x+1][location.y] <maze[location.x][location.y-1]) {
+        } else if (maze[location.x+1][location.y] <maze[location.x][location.y-1] ) {
           forwardOneSquare();
         } else if (randomNumber) {
           forwardOneSquare();
@@ -606,9 +561,9 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } 
      }else {
-          if (maze[location.x-1][location.y] >maze[location.x][location.y+1]) {
+          if (maze[location.x-1][location.y] >maze[location.x][location.y+1] ) {
           turnRight(); goForward = 1;
-        } else if (maze[location.x-1][location.y] <maze[location.x][location.y+1]) {
+        } else if (maze[location.x-1][location.y] < maze[location.x][location.y+1] ) {
           forwardOneSquare();
         } else if (randomNumber) {
           forwardOneSquare();
@@ -626,8 +581,12 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x][location.y+1] == UNSEEN ) {
           forwardOneSquare();
-        } else {
+        } else if (randomNumber == 2) {
           turnLeft(); goForward = 1;
+        } else if (randomNumber == 1) {
+          turnRight();
+        } else {
+          forwardOneSquare();
         }
       } else if (dir == BACKWARD) {
          if (maze[location.x+1][location.y] == UNSEEN) {
@@ -636,8 +595,12 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x][location.y-1] == UNSEEN ) {
           forwardOneSquare();
-        } else {
+        }  else if (randomNumber == 2) {
           turnLeft(); goForward = 1;
+        } else if (randomNumber == 1) {
+          turnRight();
+        } else {
+          forwardOneSquare();
         }
       } else if (dir == RIGHT) {
           if (maze[location.x][location.y+1] == UNSEEN) {
@@ -646,8 +609,12 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x+1][location.y] == UNSEEN ) {
           forwardOneSquare();
-        } else {
+        } else if (randomNumber == 2) {
           turnLeft(); goForward = 1;
+        } else if (randomNumber == 1) {
+          turnRight();
+        } else {
+          forwardOneSquare();
         }
         
       } else {
@@ -657,12 +624,16 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x-1][location.y] == UNSEEN ) {
           forwardOneSquare();
-        } else {
+        } else if (randomNumber == 2) {
           turnLeft(); goForward = 1;
+        } else if (randomNumber == 1) {
+          turnRight();
+        } else {
+          forwardOneSquare();
         }
       }
     }
-    delay(DELAY_DEBUG);
+    delay(200);
   }
 
 }
@@ -733,9 +704,8 @@ void turnLeft() {
 }
 
 void turnAround() {
- 
   go(LEFT, 1*TURN);
-  delay(DELAY_DEBUG);
+  delay(200);
   go(LEFT, 1*TURN);
   updateTurnAround();
 }
@@ -800,7 +770,7 @@ void centre() {
     // you are fucked.
   }
   stopRobot();
-  delay(DELAY_DEBUG);
+  delay(200);
 }
 
 
@@ -825,9 +795,4 @@ void detectWalls() {
     } else {
         rightWall=false;
     }
-    
-   
-    
-}}
-
-
+}
