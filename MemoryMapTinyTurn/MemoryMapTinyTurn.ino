@@ -206,7 +206,7 @@ goForward = 0;
 
 
   Serial.println ("SETUP COMPELETE");
-  delay(2000);
+  delay(200);
 }
 
 
@@ -616,7 +616,7 @@ void wallFollow() {
         }
       }
     }
-    delay(1000);
+    delay(200);
   }
 
 }
@@ -688,7 +688,7 @@ void turnLeft() {
 
 void turnAround() {
   go(LEFT, 1*TURN);
-  delay(1000);
+  delay(200);
   go(LEFT, 1*TURN);
   updateTurnAround();
 }
@@ -753,7 +753,7 @@ void centre() {
     // you are fucked.
   }
   stopRobot();
-  delay(500);
+  delay(200);
 }
 
 
