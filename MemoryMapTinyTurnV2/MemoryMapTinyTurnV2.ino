@@ -787,14 +787,14 @@ void detectWalls() {
     }
     
     
-    if (dir == FORWARD && maze[location.x][location.y-1] == 2) {
+    if (dir == FORWARD && maze[location.x][location.y-1] == 2  && rightWall && leftWall) {
       frontWall = true;
     }
-    else if (dir == RIGHT && maze[location.x-1][location.y] == 2) {
+    else if (dir == RIGHT && maze[location.x-1][location.y] == 2 && rightWall && leftWall) {
       frontWall = true;
-    } else if (dir == LEFT && maze[location.x+1][location.y] == 2) {
+    } else if (dir == LEFT && maze[location.x+1][location.y] == 2  && rightWall && leftWall) {
       frontWall = true;
-    } else if (dir == BACKWARD && maze[location.x][location.y+1] == 2) {
+    } else if (dir == BACKWARD && maze[location.x][location.y+1] == 2  && rightWall && leftWall) {
       frontWall = true;
     }
     
