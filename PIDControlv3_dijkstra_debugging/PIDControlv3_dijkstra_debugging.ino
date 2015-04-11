@@ -125,6 +125,9 @@ int in[]  = {
 /**
  * PATHFINDING
  **/
+ 
+ 
+ #include <MemoryFree.h>
 
 //Structs
 struct coord
@@ -364,6 +367,8 @@ public:
             Serial.println(smallest->x);
             Serial.print("smallest->y: ");
             Serial.println(smallest->y);
+            Serial.print("freeMemory()=");
+    Serial.println(freeMemory());
             
             if(smallest->x == finish.x && smallest->y == finish.y) {
                 path = (struct coord **) malloc(sizeof(*path)*PATH_LENGTH);

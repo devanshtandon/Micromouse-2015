@@ -132,10 +132,35 @@ boolean pidSwitch=AUTOMATIC;
 PololuWheelEncoders encoders;
 double enCountsL; // encoder counts
 double enCountsR;
+#define WALL_THRESHOLD (60)
 
 
-#define WALL_THRESHOLD (70)
-#define DELAY_DEBUG 1000
+
+
+#define NORTH      1
+#define EAST       2
+#define SOUTH      4
+#define WEST       8
+
+// maze storage
+#define NUMCELLS 256
+unsigned char maze[NUMCELLS]; // array holding wall info for each cell
+unsigned char mapx[NUMCELLS]; // array holding distance value of each cell
+unsigned char possibleMoves[4]; // array holding possible moves from given square
+
+unsigned char i, j = 0; // i is what cell robot is in (from 0 to 255)
+
+unsigned char state = NORTH;
+byte goal=118;
+
+boolean frontWall;
+boolean rightWall;
+boolean leftWall;
+
+boolean northWall;
+boolean eastWall;
+boolean westWall;
+boolean southWall;
 
 
 void setup() {
@@ -160,6 +185,14 @@ void setup() {
   myPID.SetSampleTime(100);
   myPID.SetOutputLimits(-255, 255);
   myPID.SetMode(pidSwitch);
+  
+     //fill maze and mapx with 0's
+  for (int k = 0; k < NUMCELLS; k++) {
+    maze[k] = 0;
+    mapx[k] = 0;
+  }
+
+  maze[0] += SOUTH;
 
   Serial.println ("SETUP COMPELETE");
   delay(2000);
@@ -168,8 +201,191 @@ void setup() {
 
 void loop() {
   
-  wallFollow();
+if ((i == 118) || (i == 120) || (i == 135) || (i == 136)) {
+    // stop, you are at the middle
+    // client.stop();
+  }
 
+  // sense things and get four booleans
+  getSensors();
+  
+  // change maze array based on what walls are there
+  if (northWall) {
+    Serial.print("maze[i]: ");
+    Serial.println(maze[i]);
+    if ((maze[i] & NORTH) == 0) {
+      maze[i] += NORTH;
+    }
+    
+    j = i + 1;
+    if ((maze[j] & SOUTH) == 0) {
+      maze[j] += SOUTH;
+    }
+    
+  }
+  
+  if (eastWall) {
+    
+    if ((maze[i] & EAST) == 0) {
+      maze[i] += EAST;
+    }
+    
+    j = i + 16;
+    if ((maze[j] & WEST) == 0) {
+      maze[j] += WEST;
+    }
+    
+  }
+  
+  if (westWall) {
+    
+    if ((maze[i] & WEST) == 0) {
+      maze[i] += WEST;
+    }
+    
+    j = i + 240;
+    if ((maze[j] & EAST) == 0) {
+      maze[j] += EAST;
+    }
+    
+  }
+  
+  if (southWall) {
+    
+    if ((maze[i] & SOUTH) == 0) {
+      maze[i] += SOUTH;
+    }
+    
+    j = i + 255;
+    if ((maze[j] & NORTH) == 0) {
+      maze[j] += NORTH;
+    }
+  }
+  
+  floodMaze(goal);
+  
+  /* sort four cell's distance values (not separated by walls)
+  and move to the smallest one */
+  int cellwalls = maze[i];
+  if (state == NORTH) {
+    
+    if ((cellwalls & NORTH) == 0) { //if there is no wall to the North
+      possibleMoves[0] = mapx[i+1];
+    } else {
+      possibleMoves[0] = 255;
+    }
+    
+    if ((cellwalls & EAST) == 0) {
+      possibleMoves[1] = mapx[i+16];
+    } else {
+      possibleMoves[1] = 255;
+    }
+    
+    if ((cellwalls & SOUTH) == 0) {
+      possibleMoves[2] = mapx[i+255];
+    } else {
+      possibleMoves[2] = 255; 
+    }
+    
+    if ((cellwalls & WEST) == 0) {
+      possibleMoves[3] = mapx[i+240];
+    } else {
+      possibleMoves[3] = 255;
+    }
+    
+  } else if (state == SOUTH) {
+    
+    if ((cellwalls & SOUTH) == 0) {
+      possibleMoves[0] = mapx[i+255];
+    } else {
+      possibleMoves[0] = 255; 
+    }
+    
+    if ((cellwalls & WEST) == 0) {
+      possibleMoves[1] = mapx[i+240];
+    } else {
+      possibleMoves[1] = 255;
+    }
+    
+    if ((cellwalls & NORTH) == 0) {
+      possibleMoves[2] = mapx[i+1];
+    } else {
+      possibleMoves[2] = 255;
+    }
+    
+    if ((cellwalls & EAST) == 0) {
+      possibleMoves[3] = mapx[i+16];
+    } else {
+      possibleMoves[3] = 255;
+    }
+    
+  } else if (state == EAST) {
+    
+    if ((cellwalls & EAST) == 0) {
+      possibleMoves[0] = mapx[i+16];
+    } else {
+      possibleMoves[0] = 255;
+    }
+    
+    if ((cellwalls & SOUTH) == 0) {
+      possibleMoves[1] = mapx[i+255];
+    } else {
+      possibleMoves[1] = 255; 
+    }
+    
+    if ((cellwalls & WEST) == 0) {
+      possibleMoves[2] = mapx[i+240];
+    } else {
+      possibleMoves[2] = 255;
+    }
+    
+    if ((cellwalls & NORTH) == 0) {
+      possibleMoves[3] = mapx[i+1];
+    } else {
+      possibleMoves[3] = 255;
+    }
+  
+  } else if (state == WEST) {
+    
+    if ((cellwalls & WEST) == 0) {
+      possibleMoves[0] = mapx[i+240];
+    } else {
+      possibleMoves[0] = 255;
+    }
+    
+    if ((cellwalls & NORTH) == 0) {
+      possibleMoves[1] = mapx[i+1];
+    } else {
+      possibleMoves[1] = 255;
+    }
+    
+    if ((cellwalls & EAST) == 0) {
+      possibleMoves[2] = mapx[i+16];
+    } else {
+      possibleMoves[2] = 255;
+    }
+    
+    if ((cellwalls & SOUTH) == 0) {
+      possibleMoves[3] = mapx[i+255];
+    } else {
+      possibleMoves[3] = 255; 
+    }
+    
+  }
+  
+  int smallest = findSmallest(possibleMoves);
+  
+  if (smallest == 0) {
+    forwardOneSquare(sp);
+  } else if (smallest == 1) {
+    turnRight();
+    forwardAfterTurn(sp);
+  } else if (smallest == 2) {
+    backwardOneSquare(sp);
+  } else if (smallest == 3) {
+    turnLeft();
+    forwardAfterTurn(sp);
+  }
 
 }
 
@@ -214,7 +430,7 @@ void go(int direction, int counts) {
           counter=0;
         }
       }
-      if (abs(input)>50 || abs(input2)>50) {
+      if (abs(input)>40 || abs(input2)>40) {
         myPID.SetMode(MANUAL);
         digitalWrite(DEBUG,LOW);
       }
@@ -331,18 +547,62 @@ void stopRobot() {
 }
 
 void forwardOneSquare() {
+  if (state == NORTH) {
+    i = i + 1;
+  } else if (state == SOUTH) {
+    i = i - 1;
+  } else if (state == WEST) {
+    i = i - 16;
+  } else if (state == EAST) {
+    i = i + 16;
+  }
   go(FORWARD, 1*SQUARE);
 }
 
 void backwardOneSquare() {
+  if (state == NORTH) {
+    i = i - 1;
+  } else if (state == SOUTH) {
+    i = i + 1;
+  } else if (state == WEST) {
+    i = i + 16;
+  } else if (state == EAST) {
+    i = i - 16;
+  }
   go(BACKWARD, 1*SQUARE);
 }
 
 void turnRight() {
+     if (state == NORTH) {
+    state -= NORTH;
+    state += EAST;
+  } else if (state == SOUTH) {
+    state -= SOUTH;
+    state += WEST;
+  } else if (state == WEST) {
+    state -= WEST;
+    state += NORTH;
+  } else if (state == EAST) {
+    state -= EAST;
+    state += SOUTH;
+  }
   go(RIGHT, 1*TURN);
 }
 
 void turnLeft() {
+    if (state == NORTH) {
+    state -= NORTH;
+    state += WEST;
+  } else if (state == SOUTH) {
+    state -= SOUTH;
+    state += EAST;
+  } else if (state == WEST) {
+    state -= WEST;
+    state += SOUTH;
+  } else if (state == EAST) {
+    state -= EAST;
+    state += NORTH;
+  }
   go(LEFT, 1*TURN);
 }
 
@@ -383,28 +643,3 @@ boolean checkWall() {
     return false;
 }
 
-
-
-void detectWalls() {
-    getSensors();
-    
-    if (sensorValues[FRONT] < WALL_THRESHOLD) {
-        frontWall= true;
-    } else {
-        frontWall=false;
-    }
-    
-    if (sensorValues[LEFT_FRONT] < WALL_THRESHOLD && sensorValues[LEFT_BACK] < WALL_THRESHOLD) {
-        leftWall= true;
-    } else {
-        leftWall=false;
-    }
-    
-    if (sensorValues[RIGHT_FRONT] < WALL_THRESHOLD && sensorValues[RIGHT_BACK] < WALL_THRESHOLD) {
-        rightWall=true;
-    } else {
-        rightWall=false;
-    }
-    
-
-}

@@ -137,6 +137,15 @@ double enCountsR;
 #define WALL_THRESHOLD (70)
 #define DELAY_DEBUG 1000
 
+boolean frontWall;
+boolean rightWall;
+boolean leftWall;
+
+boolean northWall;
+boolean eastWall;
+boolean westWall;
+boolean southWall;
+
 
 void setup() {
   
@@ -196,8 +205,10 @@ void go(int direction, int counts) {
     int counter = 0;
     int input2 = 0;
     output = 0;
+    
     while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  //1487
       getEncoders();
+      detectWalls();
       unsigned long currentMillis = millis();
       if(currentMillis - previousMillis > 20) {
         previousMillis = currentMillis; // save the last time you blinked the LED
@@ -218,6 +229,7 @@ void go(int direction, int counts) {
         myPID.SetMode(MANUAL);
         digitalWrite(DEBUG,LOW);
       }
+      else if 
       else {
         myPID.SetMode(pidSwitch);
         digitalWrite(DEBUG,HIGH);
