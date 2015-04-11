@@ -151,7 +151,8 @@ struct coord {
 //should be GLOBAL maze
 char maze[16][16];
 // random number global
-int randomNumber;
+long randomNumber;
+long randNumber3;
 //should be global location
 struct coord location;
 
@@ -187,7 +188,7 @@ goForward = 0;
   myPID.SetOutputLimits(-255, 255);
   myPID.SetMode(pidSwitch);
 
-  randomSeed(20);
+  randomSeed(analogRead(DEBUG););
   
   for (int i = 0; i<16; i++) {
   for (int j = 0; j<16; j++) {
@@ -414,7 +415,8 @@ void wallFollow() {
   while(1) {
     
     detectWalls();
-    randomNumber = random(2);
+    randomNumber = random(10);
+
     Serial.println(randomNumber);
 
     if (leftWall && rightWall && frontWall) {
@@ -443,40 +445,48 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x+1][location.y] == SEEN && maze[location.x-1][location.y] == UNSEEN) {
           turnLeft();  goForward = 1;
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
+          Serial.println("turning left");
           turnLeft();  goForward = 1;
         } else {
           turnRight; goForward = 1;
+          Serial.println("turning right");
         }
       } else if (dir == BACKWARD) {
         if (maze[location.x+1][location.y] == UNSEEN && maze[location.x-1][location.y] == SEEN) {
           turnLeft(); goForward = 1;
         } else if (maze[location.x+1][location.y] == SEEN && maze[location.x-1][location.y] == UNSEEN) {
           turnRight(); goForward = 1;
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
+          Serial.println("turning right");
           turnRight(); goForward = 1;
         } else {
           turnLeft; goForward = 1;
+          Serial.println("turning left");
         }
       } else if (dir == LEFT) {
         if (maze[location.x][location.y+1] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
           turnRight(); goForward = 1;
         } else if (maze[location.x][location.y+1] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
           turnLeft(); goForward = 1;
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
         } else {
           turnRight; goForward = 1;
+          Serial.println("turning right");
         }
       } else {
         if (maze[location.x+1][location.y] == UNSEEN && maze[location.x-1][location.y] == SEEN) {
           turnLeft(); goForward = 1;
         } else if (maze[location.x+1][location.y] == SEEN && maze[location.x-1][location.y] == UNSEEN) {
           turnRight(); goForward = 1;
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           turnRight(); goForward = 1;
+          Serial.println("turning right");
         } else {
           turnLeft; goForward = 1;
+          Serial.println("turning left");
         }
       }
     }
@@ -486,40 +496,48 @@ void wallFollow() {
           turnLeft(); goForward = 1;
         } else if (maze[location.x-1][location.y] == SEEN && maze[location.x][location.y+1] == UNSEEN) {
           forwardOneSquare();
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           forwardOneSquare();
+          
         } else {
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
         }
       } else if (dir == BACKWARD) {
         if (maze[location.x+1][location.y] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
           turnLeft(); goForward = 1;
         } else if (maze[location.x+1][location.y] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
           forwardOneSquare();
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           forwardOneSquare();
+          
         } else {
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
         } 
         }else if (dir == RIGHT) {
           if (maze[location.x+1][location.y] == SEEN && maze[location.x][location.y+1] == UNSEEN) {
           turnLeft(); goForward = 1;
         } else if (maze[location.x+1][location.y] == UNSEEN && maze[location.x][location.y+1] == SEEN) {
           forwardOneSquare();
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           forwardOneSquare();
+          
         } else {
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
         } 
      }else {
           if (maze[location.x-1][location.y] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
           turnLeft(); goForward = 1;
         } else if (maze[location.x-1][location.y] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
           forwardOneSquare();
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           forwardOneSquare();
+          
         } else {
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
         }
       }
     }
@@ -529,45 +547,53 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x+1][location.y] == SEEN && maze[location.x][location.y+1] == UNSEEN) {
           forwardOneSquare();
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           forwardOneSquare();
+          
         } else {
           turnRight(); goForward = 1;
+          Serial.println("turning right");
         }
       } else if (dir == BACKWARD) {
         if (maze[location.x-1][location.y] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
           turnRight(); goForward = 1;
         } else if (maze[location.x-1][location.y] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
           forwardOneSquare();
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           forwardOneSquare();
+          
         } else {
           turnRight(); goForward = 1;
+          Serial.println("turning right");
         } 
         }else if (dir == RIGHT) {
           if (maze[location.x+1][location.y] == SEEN && maze[location.x][location.y-1] == UNSEEN) {
           turnRight(); goForward = 1;
         } else if (maze[location.x+1][location.y] == UNSEEN && maze[location.x][location.y-1] == SEEN) {
           forwardOneSquare();
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           forwardOneSquare();
+          
         } else {
           turnRight(); goForward = 1;
+          Serial.println("turning right");
         } 
      }else {
           if (maze[location.x-1][location.y] == SEEN && maze[location.x][location.y+1] == UNSEEN) {
           turnRight(); goForward = 1;
         } else if (maze[location.x-1][location.y] == UNSEEN && maze[location.x][location.y+1] == SEEN) {
           forwardOneSquare();
-        } else if (randomNumber) {
+        } else if (randomNumber < 5) {
           forwardOneSquare();
+          
         } else {
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
         }
       }    
     }
     else {
-      int randNumber3 = random(2);
+      randNumber3 = random(10);
       if (dir == FORWARD) {
         if (maze[location.x-1][location.y] == UNSEEN) {
           turnLeft(); goForward = 1;
@@ -575,8 +601,14 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x][location.y+1] == UNSEEN ) {
           forwardOneSquare();
-        } else {
+        } else if (randNumber3 < 3) {
+          turnRight(); goForward = 1;
+          Serial.println("turning right");
+        } else if (randNumber3 < 6)
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
+        } else {
+          forwardOneSquare();
         }
       } else if (dir == BACKWARD) {
          if (maze[location.x+1][location.y] == UNSEEN) {
@@ -585,8 +617,14 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x][location.y-1] == UNSEEN ) {
           forwardOneSquare();
-        } else {
+         } else if (randNumber3 < 3) {
+          turnRight(); goForward = 1;
+          Serial.println("turning right");
+        } else if (randNumber3 < 6)
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
+        } else {
+          forwardOneSquare();
         }
       } else if (dir == RIGHT) {
           if (maze[location.x][location.y+1] == UNSEEN) {
@@ -595,8 +633,14 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x+1][location.y] == UNSEEN ) {
           forwardOneSquare();
-        } else {
+         } else if (randNumber3 < 3) {
+          turnRight(); goForward = 1;
+          Serial.println("turning right");
+        } else if (randNumber3 < 6)
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
+        } else {
+          forwardOneSquare();
         }
         
       } else {
@@ -606,8 +650,14 @@ void wallFollow() {
           turnRight(); goForward = 1;
         } else if (maze[location.x-1][location.y] == UNSEEN ) {
           forwardOneSquare();
-        } else {
+         } else if (randNumber3 < 3) {
+          turnRight(); goForward = 1;
+          Serial.println("turning right");
+        } else if (randNumber3 < 6)
           turnLeft(); goForward = 1;
+          Serial.println("turning left");
+        } else {
+          forwardOneSquare();
         }
       }
     }
