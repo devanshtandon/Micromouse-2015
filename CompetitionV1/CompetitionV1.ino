@@ -187,7 +187,7 @@ goForward = 0;
   myPID.SetOutputLimits(-255, 255);
   myPID.SetMode(pidSwitch);
 
-  randomSeed(20);
+  randomSeed(analogRead(A0));
   
   for (int i = 0; i<16; i++) {
   for (int j = 0; j<16; j++) {

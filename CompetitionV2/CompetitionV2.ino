@@ -604,7 +604,7 @@ void wallFollow() {
         } else if (randNumber3 < 3) {
           turnRight(); goForward = 1;
           Serial.println("turning right");
-        } else if (randNumber3 < 6)
+        } else if (randNumber3 < 6) {
           turnLeft(); goForward = 1;
           Serial.println("turning left");
         } else {
@@ -620,7 +620,7 @@ void wallFollow() {
          } else if (randNumber3 < 3) {
           turnRight(); goForward = 1;
           Serial.println("turning right");
-        } else if (randNumber3 < 6)
+        } else if (randNumber3 < 6) {
           turnLeft(); goForward = 1;
           Serial.println("turning left");
         } else {
@@ -636,7 +636,7 @@ void wallFollow() {
          } else if (randNumber3 < 3) {
           turnRight(); goForward = 1;
           Serial.println("turning right");
-        } else if (randNumber3 < 6)
+        } else if (randNumber3 < 6) {
           turnLeft(); goForward = 1;
           Serial.println("turning left");
         } else {
@@ -653,7 +653,7 @@ void wallFollow() {
          } else if (randNumber3 < 3) {
           turnRight(); goForward = 1;
           Serial.println("turning right");
-        } else if (randNumber3 < 6)
+        } else if (randNumber3 < 6) {
           turnLeft(); goForward = 1;
           Serial.println("turning left");
         } else {
@@ -663,7 +663,6 @@ void wallFollow() {
     }
     delay(200);
   }
-
 }
 
 
