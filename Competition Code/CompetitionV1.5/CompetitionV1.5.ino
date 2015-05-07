@@ -1,18 +1,24 @@
 /* micromouse2015.ino 
-Christopher Datsikas
+
 Devansh Tandon
+Henry Li
+Richard Chang
+Alex Ringlein
+Christopher Datsikas
+Bernardo Savaria
+
 Created: 03-16-2015
 Last Modified: 03-22-2015
-Status: In Progress
+Status: Complete
 Arduino Code for Micromouse for 
 2015 Brown IEEE Robotics Competition
-Github: https://urldefense.proofpoint.com/v2/url?u=https-3A__github.com_devanshtandon_Micromouse-2D2015&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=9JgUlRVcDU1LnZI1K7K10kEQWIZQsUSl_HR7oUfGNwg&e= 
-Upverter: https://urldefense.proofpoint.com/v2/url?u=https-3A__upverter.com_chrisdats_26efdb039ba46d67_Micromouse2015_&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=Lwi2bWaXUhpoOyBSn-f1X2hNvc-TnL4aclxY-A7cPK8&e= 
+
 Components:
 - TB6612FNG Dual Motor Driver Carrier - https://urldefense.proofpoint.com/v2/url?u=https-3A__www.pololu.com_product_713&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=jeuuFd2xX9PDgS-1VF7hRSbklv429eljQyxoyXuHWWI&e= 
 - 75:1 Micro Metal Gearmotor HP with Extended Motor Shaft - https://urldefense.proofpoint.com/v2/url?u=https-3A__www.pololu.com_product_2215&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=6VGdtzYqEOtr8TtMUZCAEDkKMOuaF7GhKiYh4D-MRRM&e= 
 - Sharp GP2Y0A51SK0F Analog Distance Sensor 2-15cm - https://urldefense.proofpoint.com/v2/url?u=https-3A__www.pololu.com_product_2450&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=30C5odkdmPkMPxYhFAmJK2suDeztJdkqX5hug7kG3dg&e= 
 - Magnetic Encoders 12 CPR https://urldefense.proofpoint.com/v2/url?u=https-3A__www.pololu.com_product_2598&d=AwIGAg&c=-dg2m7zWuuDZ0MUcV7Sdqw&r=CMK86WddPzKBR8aS9xUfCIpO4VcEDRH-I4XgL4HK2Lc&m=2oUcaJb4DGLCRDrkvWxJD3UdUtEyZY7NdXYuwwy2FCs&s=gE7qdD7jFtKh2iX5LXW919sqjfybxeSkkJ8YglZGRgA&e= 
+
 Connections:
 ARD -- OTHER COMPONEENTS
 D2  -- AIN2 Motor Driver
@@ -101,21 +107,12 @@ int in[]  = {
 #define CALIBRATION_ARRAY_SIZE 20
 #define READ_SENSOR(c) (FmultiMap(analogRead(c), in, out, CALIBRATION_ARRAY_SIZE))
 double sensorValues[5];
-//boolean walls[4] = {false, false, false, false};
-//#define LEFT_WALL walls[0]
-//#define FRONT_WALL walls[1]
-//#define RIGHT_WALL walls[2]
-//#define BACK_WALL walls[3]
-//// 0 -- Left
-//// 1 -- Front
-//// 2 -- Right
-//// 2 -- Back
 
 
-// MOTOR CONTROL CONSTANTS: NEEDS FINE-TUNING
+// MOTOR CONTROL CONSTANTS:
 const int COUNTS_PER_CM=93; 
-const int SQUARE=1750;  // 1750
-const int TURN=780;     // 795
+const int SQUARE=1750;  
+const int TURN=780;     
 double spL = 74;
 double spR = 73;
 
@@ -218,7 +215,6 @@ void loop() {
 
 
 //updating when moving forward
-
 void updateForward() {
   if (dir == FORWARD) {
     location.y++;
@@ -303,10 +299,6 @@ void go(int direction, int counts) {
   getSensors();
   boolean wallClose=false;
 
-  // if (sensorValues[FRONT] < WALL_THRESHOLD) FRONT_WALL = true;
-  // if (sensorValues[LEFT_FRONT] < WALL_THRESHOLD) LEFT_WALL = true;
-  // if (sensorValues[RIGHT_FRONT] < WALL_THRESHOLD) RIGHT_WALL = true;
-
   if (direction == FORWARD) {
 
     // difference between forward left and right sensors
@@ -325,7 +317,7 @@ void go(int direction, int counts) {
     int input2 = 0;
     output = 0;
     
-    while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  //1487
+    while ( (enCountsL+enCountsR)/2 <counts && !wallClose) {  
       getEncoders();
       detectWalls();
       unsigned long currentMillis = millis();
@@ -753,7 +745,8 @@ void centre() {
   }
   else {
     // no centre-ing possible
-    // you are fucked.
+    // you are screwed.
+    // good luck.
   }
   stopRobot();
   delay(200);
