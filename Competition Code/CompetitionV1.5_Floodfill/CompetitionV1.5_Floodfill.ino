@@ -700,31 +700,11 @@ createMoveset(unsigned char start, unsigned char *moveset)
             nextMove(DSOUTH, &orientation, &moveset, &i);
         } else {
             moveset[0] = 0;
-            printf("MOVESET:\nNo path to target!\n");
             return;
         }
     }
     
     moveset[i] = 0;
-    
-    printf("MOVESET:\n");
-    
-    for(int i=0; moveset[i] != 0; i++) {
-        switch(moveset[i]) {
-            case LEFT:
-                printf("LEFT\n");
-                break;
-            case RIGHT:
-                printf("RIGHT\n");
-                break;
-            case FORWARD:
-                printf("FORWARD\n");
-                break;
-            case ENDSTEP:
-                printf("END STEP\n");
-                break;
-        }
-    }
     
     return;
 }
