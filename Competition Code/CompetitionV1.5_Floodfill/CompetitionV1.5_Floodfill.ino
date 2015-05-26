@@ -217,14 +217,7 @@ void setup() {
     
     for(int j=0; j < 16; j++) {
         for(int i=0; i < 16; i++) {
-            wall = 0;
-            if(i == 0) wall += FEAST + FWEST;
-            if(j == 0) wall += FSOUTH + FNORTH;
-            if(i == 15) wall += FWEST + FEAST;
-            if(j == 15) wall += FNORTH + FSOUTH;
-            if(i == 10) wall = 0;
-
-            maze[i + 16*j] = wall;
+            maze[i + 16*j] = 0;
         }
     }
 
